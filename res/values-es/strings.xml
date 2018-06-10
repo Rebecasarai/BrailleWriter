@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+ Copyright 2016 The TensorFlow Authors. All Rights Reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources>
+    <string name="title_activity_main">Braille Writer</string>
+    <string name="description_info">Info</string>
+    <string name="request_permission">This sample needs camera permission.</string>
+    <string name="camera_error">This device doesn\'t support Camera2 API.</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="ok">OK</string>
+    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+    <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
+    <string name="low_storage_error">Ocr dependencies cannot be downloaded due to low device storage</string>
+    <string name="ocr_header">Toca &quot;Detect Text&quot; para detectar texto</string>
+    <string name="read_text">Detect Text</string>
+    <string name="auto_focus">Auto Focus</string>
+    <string name="use_flash">Use Flash</string>
+    <string name="ocr_success">Text read successfully</string>
+    <string name="ocr_failure">No text captured</string>
+    <string name="ocr_error">"Error reading text: %1$s"</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">Leer</string>
+    <string name="title_dashboard">Reconocer</string>
+    <string name="title_notifications">Traducir</string>
+    <string name="title_faces">Rostros</string>
+    <string name="title_sttings">Ajustes</string>
+    <string name="spanish">Español</string>
+    <string name="english">English</string>
+    <string name="convertorButton">Elegir documento</string>
+    <string name="not_translate">El documento elegido No se pudo traducir a braille</string>
+    <string name="content_description_app_loading_image">Imagen de cargando</string>
+
+    <string name="app_name">Braille Writer</string>
+    <string name="activity_name_classification">Reconocimiento</string>
+
+
+
+</resources>

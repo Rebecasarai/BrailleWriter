@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/navigation_read"
+        android:icon="@drawable/ic_chat_black_24dp"
+        android:title="@string/title_home"
+        app:itemBackground="@color/colorPrimary"
+        android:iconTint="@color/colorPrimaryDark"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/navigation_faces"
+        android:icon="@drawable/ic_person_black_24dp"
+        android:title="@string/title_faces"
+        app:itemBackground="@color/colorPrimary"
+        android:iconTint="@color/colorPrimaryDark"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/navigation_recognite"
+        app:showAsAction="always"
+        app:itemBackground="@color/colorPrimary"
+        android:icon="@drawable/ic_panorama_black_24dp"
+        android:title="@string/title_dashboard" />
+
+
+    <item
+        android:id="@+id/navigation_translate"
+        android:icon="@drawable/ic_subject_black_24dp"
+        android:iconTint="@color/colorPrimaryDark"
+        app:itemBackground="@color/colorPrimary"
+        android:title="@string/title_notifications"
+        app:showAsAction="always" />
+
+
+    <item
+        android:id="@+id/navigation_settings"
+        android:iconTint="@color/colorPrimaryDark"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="@string/title_sttings"
+        app:itemBackground="@color/colorPrimary"
+        app:showAsAction="always" />
+
+
+</menu>

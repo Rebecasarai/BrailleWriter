@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1066373863562",
+    "firebase_url": "https://braille-writer-f585e.firebaseio.com",
+    "project_id": "braille-writer-f585e",
+    "storage_bucket": "braille-writer-f585e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1066373863562:android:d2d58c16f0e5d8c3",
+        "android_client_info": {
+          "package_name": "com.rebecasarai.braillewriter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1066373863562-8nrj0dlvav02fkj4n978clvtrhj91v2b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rebecasarai.braillewriter",
+            "certificate_hash": "1aba182bbf9b155841160c2e89c01163afde1b92"
+          }
+        },
+        {
+          "client_id": "1066373863562-q54die869j9l96f0fg1da6phfjsai3ge.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeMTIftt8TzIL6POuqdFks_z4lbtCtwSs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1066373863562-q54die869j9l96f0fg1da6phfjsai3ge.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

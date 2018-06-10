@@ -1,0 +1,81 @@
+project.buildDir = 'gradleBuild'
+getProject().setBuildDir('gradleBuild')
+
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath 'org.apache.httpcomponents:httpclient:4.5.2'
+        classpath 'com.google.gms:google-services:3.1.0'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        google()
+    }
+}
+
+project.ext.ASSET_DIR = projectDir.toString() + '/assets'
+project.ext.TMP_DIR = project.buildDir.toString()
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '27.0.3'
+
+    lintOptions {
+        abortOnError false
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDir 'src'
+            }
+
+            manifest.srcFile 'AndroidManifest.xml'
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = [project.ext.ASSET_DIR]
+            jniLibs.srcDirs = ['libs']
+        }
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+}
+
+// Download default models; if you wish to use your own models then
+// place them in the "assets" directory and comment out this line.
+apply from: "download-models.gradle"
+
+dependencies {
+
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:design:26.1.0'
+
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.google.firebase:firebase-database:11.8.0'
+    implementation 'com.google.android.gms:play-services-vision:11.8.0'
+
+
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation "com.android.support:cardview-v7:26.1.0"
+    implementation "com.android.support:recyclerview-v7:26.1.0"
+    implementation 'com.jakewharton.timber:timber:4.7.0'
+    implementation 'com.android.billingclient:billing:1.1'
+    //if (nativeBuildSystem == 'cmake' || nativeBuildSystem == 'none') {
+    implementation 'org.tensorflow:tensorflow-android:+'
+    compile 'com.google.code.gson:gson:2.3.1'
+    //}
+}
+
+apply plugin: 'com.google.gms.google-services'
