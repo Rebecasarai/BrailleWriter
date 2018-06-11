@@ -13,13 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-package com.rebecasarai.braillewriter.classification;
+// NOTE: no native object detectors are currently provided or used by the code
+// in this directory. This class remains mainly for historical reasons.
+// Detection in the TF demo is done through TensorFlowMultiBoxDetector.java.
 
-import com.rebecasarai.braillewriter.classification.ObjectRecognition;
+#include "tensorflow/examples/android/jni/object_tracking/object_detector.h"
 
-import java.util.List;
+namespace tf_tracking {
 
-public interface ResultsView {
-  public void setResults(final List<ObjectRecognition> results);
+// This is here so that the vtable gets created properly.
+ObjectDetectorBase::~ObjectDetectorBase() {}
 
-}
+}  // namespace tf_tracking

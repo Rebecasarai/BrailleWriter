@@ -16,12 +16,15 @@ package com.rebecasarai.braillewriter.fragments;
  * limitations under the License.
  */
 
+import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Size;
 import android.util.SparseIntArray;
@@ -50,11 +53,38 @@ public class LegacyCameraConnectionFragment extends Fragment {
    */
   private int layout;
 
+  @SuppressLint("ValidFragment")
   public LegacyCameraConnectionFragment(
       final Camera.PreviewCallback imageListener, final int layout, final Size desiredSize) {
     this.imageListener = imageListener;
     this.layout = layout;
     this.desiredSize = desiredSize;
+  }
+
+  public LegacyCameraConnectionFragment() {
+
+  }
+
+  // invoked when the activity may be temporarily destroyed, save the instance state here
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    outState.putInt("layout", layout);
+    outState.putSize("desiredSize", desiredSize);
+
+
+    // call superclass to save any view hierarchy
+    super.onSaveInstanceState(outState);
+  }
+
+
+  @Override
+  public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+    super.onViewStateRestored(savedInstanceState);
+    if(savedInstanceState !=null){
+
+      this.layout = savedInstanceState.getInt("layout");
+      this.desiredSize = savedInstanceState.getSize("desiredSize");
+    }
   }
 
   /**
@@ -93,7 +123,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
               sizes[i++] = new Size(size.width, size.height);
             }
             Size previewSize =
-                CameraConFragment.chooseOptimalSize(
+                CameraConnectionFragment.chooseOptimalSize(
                     sizes, desiredSize.getWidth(), desiredSize.getHeight());
             parameters.setPreviewSize(previewSize.getWidth(), previewSize.getHeight());
             camera.setDisplayOrientation(90);
@@ -138,6 +168,13 @@ public class LegacyCameraConnectionFragment extends Fragment {
   @Override
   public View onCreateView(
       final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+
+    // recovering the instance state
+    if (savedInstanceState != null) {
+      this.layout = savedInstanceState.getInt("layout");
+      this.desiredSize = savedInstanceState.getSize("desiredSize");
+      this.imageListener = savedInstanceState.getParcelable("imageListener");
+    }
     return inflater.inflate(layout, container, false);
   }
 

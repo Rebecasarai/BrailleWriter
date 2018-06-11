@@ -15,7 +15,6 @@ task downloadFile(type: Download){
     overwrite true
 }
 
-
 task extractModels(type: Copy) {
     from zipTree(project.ext.TMP_DIR + '/' + "inception5h.zip")
 

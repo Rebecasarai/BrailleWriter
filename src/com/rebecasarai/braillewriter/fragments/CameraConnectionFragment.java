@@ -70,7 +70,7 @@ import com.rebecasarai.braillewriter.ui.objectRecognition.AutoFitTextureView;
 import timber.log.Timber;
 
 @SuppressLint("ValidFragment")
-public class CameraConFragment extends Fragment {
+public class CameraConnectionFragment extends Fragment {
 
   /**
    * The camera preview size will be chosen to be the smallest frame by pixel size capable of
@@ -236,7 +236,7 @@ public class CameraConFragment extends Fragment {
 
   private final ConnectionCallback cameraConnectionCallback;
 
-  private CameraConFragment(
+  private CameraConnectionFragment(
           final ConnectionCallback connectionCallback,
           final OnImageAvailableListener imageListener,
           final int layout,
@@ -315,12 +315,12 @@ public class CameraConFragment extends Fragment {
     }
   }
 
-  public static CameraConFragment newInstance(
+  public static CameraConnectionFragment newInstance(
           final ConnectionCallback callback,
           final OnImageAvailableListener imageListener,
           final int layout,
           final Size inputSize) {
-    return new CameraConFragment(callback, imageListener, layout, inputSize);
+    return new CameraConnectionFragment(callback, imageListener, layout, inputSize);
   }
 
   @Override
@@ -417,7 +417,7 @@ public class CameraConFragment extends Fragment {
   }
 
   /**
-   * Opens the camera specified by {@link CameraConFragment#cameraId}.
+   * Opens the camera specified by {@link CameraConnectionFragment#cameraId}.
    */
   private void openCamera(final int width, final int height) {
     setUpCameraOutputs();

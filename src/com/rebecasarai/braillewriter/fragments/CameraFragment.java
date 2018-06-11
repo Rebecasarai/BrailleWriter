@@ -83,8 +83,6 @@ public abstract class CameraFragment extends Fragment
 
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        //rootview.setContentView(R.layout.activity_camera);
-
         if (hasPermission()) {
             setFragment();
         } else {
@@ -363,9 +361,9 @@ public abstract class CameraFragment extends Fragment
 
         Fragment fragment;
         if (useCamera2API) {
-            CameraConFragment camera2Fragment =
-                    CameraConFragment.newInstance(
-                            new CameraConFragment.ConnectionCallback() {
+            CameraConnectionFragment camera2Fragment =
+                    CameraConnectionFragment.newInstance(
+                            new CameraConnectionFragment.ConnectionCallback() {
                                 @Override
                                 public void onPreviewSizeChosen(final Size size, final int rotation) {
                                     previewHeight = size.getHeight();

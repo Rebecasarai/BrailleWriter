@@ -13,13 +13,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-package com.rebecasarai.braillewriter.classification;
+#include "tensorflow/examples/android/jni/object_tracking/time_log.h"
 
-import com.rebecasarai.braillewriter.classification.ObjectRecognition;
+#ifdef LOG_TIME
+// Storage for logging functionality.
+int num_time_logs = 0;
+LogEntry time_logs[NUM_LOGS];
 
-import java.util.List;
-
-public interface ResultsView {
-  public void setResults(final List<ObjectRecognition> results);
-
-}
+int num_avg_entries = 0;
+AverageEntry avg_entries[NUM_LOGS];
+#endif
