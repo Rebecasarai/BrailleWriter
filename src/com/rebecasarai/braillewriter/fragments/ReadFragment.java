@@ -41,7 +41,7 @@ import java.util.Set;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ReadFragment extends Fragment implements View.OnTouchListener {
+public class ReadFragment extends Fragment implements View.OnTouchListener, TextToSpeech.OnInitListener {
     private static final String TAG = "OCRManager";
 
     // Intent request code to handle updating play services if needed.
@@ -107,29 +107,13 @@ public class ReadFragment extends Fragment implements View.OnTouchListener {
         }
 
         toSpeak= "Ha entrado en leer";
-
-        /*if(model.getmSeletedFragment().getValue().getClass().equals(this.getClass())){
-            toSpeak = "";
-        }*/
-
-        /*if(model.getmSameFragment().getValue()){
+        /*if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
             toSpeak="";
-            model.setmSameFragment(false);
+            model.getmSameFragment().setValue(false);
+            Timber.e("ENTRO SAME FRAGMENT");
         }*/
 
-        model.getmSameFragment().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                Timber.e("ENTRO SAME FRAGMENT");
-            }
-        });
-        model.getmSeletedFragment().observe(this, new Observer<Fragment>() {
-            @Override
-            public void onChanged(@Nullable Fragment fragment) {
-                Timber.e("ENTRO Selected fragment");
-            }
-        });
-
+/*
         tts2= new TextToSpeech(getContext(),new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -141,7 +125,7 @@ public class ReadFragment extends Fragment implements View.OnTouchListener {
                     tts2.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
-        });
+        });ç*/
 
         //Tenia CaptureGestureListener, cambiado por OnSwipeTouchListener
         gestureDetector = new GestureDetector(getContext(), new CaptureGestureListener());
@@ -351,6 +335,15 @@ public class ReadFragment extends Fragment implements View.OnTouchListener {
         boolean c = gestureDetector.onTouchEvent(e);
 
         return b || c;//|| super.onTouchEvent(e);
+    }
+
+    @Override
+    public void onInit(int status) {
+        if(status != TextToSpeech.ERROR) {
+            tts2.setLanguage(Locale.getDefault());
+            tts2.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
+        }
+
     }
 
     private class CaptureGestureListener extends GestureDetector.SimpleOnGestureListener {

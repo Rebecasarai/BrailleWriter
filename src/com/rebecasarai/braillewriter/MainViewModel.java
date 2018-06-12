@@ -64,6 +64,7 @@ public class MainViewModel extends AndroidViewModel {
         //context = application.getApplicationContext();
         tag = "In App Billing";
         isRecentlySuscribed.setValue(false);
+        setmSameFragment(false);
 
         Intent billingIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
         billingIntent.setPackage("com.android.vending");
@@ -265,16 +266,6 @@ public class MainViewModel extends AndroidViewModel {
         this.isRecentlySuscribed.setValue(isRecentlySuscribed);
     }
 
-
-
-
-
-
-
-
-
-
-
     public MutableLiveData<Boolean> getmSameFragment() {
         if(mSameFragment == null){
             mSameFragment.setValue(false);
@@ -307,4 +298,11 @@ public class MainViewModel extends AndroidViewModel {
     }
 
 
+    public MutableLiveData<TextToSpeech> getTts() {
+        return tts;
+    }
+
+    public void setTts(TextToSpeech tts) {
+        this.tts.setValue(tts);
+    }
 }

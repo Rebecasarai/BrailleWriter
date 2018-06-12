@@ -62,7 +62,6 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
 
     private TextToSpeech tts;
     private String toSpeak ;
-    private SubscriptionManagerProvider mSubscriptionProvider;
 
 
     public FacesFragment() {
@@ -81,20 +80,12 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         mFaceDetected = false;
         findViews(rootview);
         toSpeak = "Ha entrado a Reconocimiento de rostros";
-/*
-        mSubscriptionProvider = (SubscriptionManagerProvider) getActivity();
-        if(mSubscriptionProvider.getSubsV3Manager().isRecentlySuscribed()){
-            toSpeak = "Felicidades, se ha suscrito exitosamente. Reconozca emociones";
-            mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
-        }*/
 
 
 
         MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        //model.getIsRecentlySuscribed().observe();
         if(model.getIsRecentlySuscribed().getValue()){
             toSpeak = "Felicidades, se ha suscrito exitosamente. Reconozca emociones";
-//            mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
             model.setIsRecentlySuscribed(true);
         }
 

@@ -33,10 +33,8 @@ import org.json.JSONObject;
 
 import timber.log.Timber;
 
-public class HomeActivity extends AppCompatActivity implements SubscriptionManagerProvider {
-    private SubscriptionManager subsV3Manager;
+public class HomeActivity extends AppCompatActivity {
     private Fragment selectedFragment;
-    private boolean initialStatus;
     private boolean suscrito;
      MainViewModel model;
 
@@ -75,6 +73,9 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
             }
         });
 
+
+
+
         bottomNavigationView.setOnNavigationItemSelectedListener
                 (new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -93,21 +94,11 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                                 break;
 
                             case R.id.navigation_faces:
-                                //if(subsV3Manager.checkSubscribedMonth()){
-                                //if(model.checkSubscribedMonth()){
                                 if(model.checkSubscribedMonth()){
                                     selectedFragment = FacesFragment.newInstance();
                                 }else{
                                     selectedFragment = SubscribeFragment.newInstance();
                                 }
-
-                                //}else{
-
-                                //}
-
-                                //}else{
-                                //}
-
                                 break;
 
                             case R.id.navigation_settings:
@@ -115,16 +106,10 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                                 break;
                         }
                         model.setmSeletedFragment(selectedFragment);
-                        //setFragment(selectedFragment);
 
                         return true;
                     }
                 });
-
-
-        /*if(selectedFragment == null){
-            model.setmSeletedFragment(ReadFragment.newInstance());
-        }*/
 
         model.getmSeletedFragment().observe(this, new Observer<Fragment>() {
             @Override
@@ -132,17 +117,20 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                 //selectedFragment = fragment;
                 //Timber.e("ENTRO Selected fragment");
 
+                if(fragment == selectedFragment){
+                    Timber.e("igualessss");
+                    model.getmSameFragment().setValue(true);
+                }
+
                 setFragment(fragment);
             }
         });
 
 
-        model.getmSameFragment().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                Timber.e("ENTRO SAME FRAGMENT");
-            }
-        });
+        if(selectedFragment == null){
+            model.setmSeletedFragment(ReadFragment.newInstance());
+        }
+
 
 
 
@@ -154,6 +142,7 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.framelayout, selectedFragment, "currentFragment");
             transaction.commit();
+            model.getmSameFragment().setValue(false);
         }
     }
 
@@ -164,11 +153,6 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
         //subsV3Manager.doUnbindService();
         super.onDestroy();
 
-    }
-
-    @Override
-    public SubscriptionManager getSubsV3Manager() {
-        return subsV3Manager;
     }
 
     @Override
