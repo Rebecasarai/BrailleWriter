@@ -12,21 +12,15 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.rebecasarai.braillewriter.MainViewModel;
-import com.rebecasarai.braillewriter.fragments.SubscribeFragment;
-
 import com.rebecasarai.braillewriter.BuildConfig;
+import com.rebecasarai.braillewriter.MainViewModel;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.fragments.AboutFragment;
 import com.rebecasarai.braillewriter.fragments.BrailleTranslatorFragment;
 import com.rebecasarai.braillewriter.fragments.FacesFragment;
-import com.rebecasarai.braillewriter.fragments.ReadFragment;
 import com.rebecasarai.braillewriter.fragments.ObjectRecognitionFragment;
-import com.rebecasarai.braillewriter.subscription.Subscription;
-import com.rebecasarai.braillewriter.subscription.SubscriptionManager;
-import com.rebecasarai.braillewriter.subscription.SubscriptionManagerProvider;
-
-import android.content.Context;
+import com.rebecasarai.braillewriter.fragments.ReadFragment;
+import com.rebecasarai.braillewriter.fragments.SubscribeFragment;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -106,7 +100,6 @@ public class HomeActivity extends AppCompatActivity {
                                 break;
                         }
                         model.setmSeletedFragment(selectedFragment);
-
                         return true;
                     }
                 });
@@ -201,9 +194,5 @@ public class HomeActivity extends AppCompatActivity {
 
         }
     }
-
-
-
-
 
 }
