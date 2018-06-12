@@ -83,7 +83,7 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
             "file:///android_asset/imagenet_comp_graph_label_strings.txt";
 
 
-    private static final boolean MAINTAIN_ASPECT = false;
+    private static final boolean MAINTAIN_ASPECT = true;
 
     private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
 
