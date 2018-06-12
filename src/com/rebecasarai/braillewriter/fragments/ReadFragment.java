@@ -25,17 +25,18 @@ import android.view.ViewGroup;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.rebecasarai.braillewriter.MainViewModel;
-import com.rebecasarai.braillewriter.ui.OCR.OCRManager;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.ui.OCR.CameraSource;
 import com.rebecasarai.braillewriter.ui.OCR.CameraSourcePreview;
 import com.rebecasarai.braillewriter.ui.OCR.GraphicOverlay;
+import com.rebecasarai.braillewriter.ui.OCR.OCRManager;
 import com.rebecasarai.braillewriter.ui.OCR.OcrGraphic;
 
-import timber.log.Timber;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Set;
+
+import timber.log.Timber;
 
 
 /**
@@ -53,6 +54,9 @@ public class ReadFragment extends Fragment implements View.OnTouchListener {
     // Constants used to pass extra data in the intent
     public static final String AutoFocus = "AutoFocus";
     public static final String UseFlash = "UseFlash";
+
+    // Instance
+    private static ReadFragment INSTANCE = new ReadFragment();
 
     private CameraSource mCameraSource;
     private CameraSourcePreview mPreview;
@@ -73,9 +77,11 @@ public class ReadFragment extends Fragment implements View.OnTouchListener {
         // Required empty public constructor
     }
 
-    public static ReadFragment newInstance() {
-        ReadFragment fragment = new ReadFragment();
-        return fragment;
+    public static ReadFragment getInstance() {
+        if(INSTANCE==null){
+            INSTANCE = new ReadFragment();
+        }
+        return INSTANCE;
     }
 
 

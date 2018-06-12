@@ -22,11 +22,8 @@ import com.rebecasarai.braillewriter.fragments.BrailleTranslatorFragment;
 import com.rebecasarai.braillewriter.fragments.FacesFragment;
 import com.rebecasarai.braillewriter.fragments.ReadFragment;
 import com.rebecasarai.braillewriter.fragments.ObjectRecognitionFragment;
-import com.rebecasarai.braillewriter.subscription.Subscription;
 import com.rebecasarai.braillewriter.subscription.SubscriptionManager;
 import com.rebecasarai.braillewriter.subscription.SubscriptionManagerProvider;
-
-import android.content.Context;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,9 +32,9 @@ import timber.log.Timber;
 
 public class HomeActivity extends AppCompatActivity implements SubscriptionManagerProvider {
     private SubscriptionManager subsV3Manager;
-    private Fragment selectedFragment;
+    private Fragment mSelectedFragment;
     private boolean initialStatus;
-    private boolean suscrito;
+    private boolean isSubscribed;
      MainViewModel model;
 
     @Override
@@ -63,14 +60,14 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
         model = ViewModelProviders.of(this).get(MainViewModel.class);
 
         if(model.getIsSubscribed().getValue()){
-            suscrito = true;
+            isSubscribed = true;
         }
 
         model.getIsSubscribed().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
                 if(aBoolean != null){
-                    suscrito = aBoolean;
+                    isSubscribed = aBoolean;
                 }
             }
         });
@@ -79,26 +76,26 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                 (new BottomNavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                        selectedFragment = null;
+                        mSelectedFragment = null;
                         switch (item.getItemId()) {
                             case R.id.navigation_read:
-                                selectedFragment = ReadFragment.newInstance();
+                                mSelectedFragment = ReadFragment.getInstance();
                                 break;
                             case R.id.navigation_recognite:
-                                selectedFragment = ObjectRecognitionFragment.newInstance();
+                                mSelectedFragment = ObjectRecognitionFragment.getInstance();
 
                                 break;
                             case R.id.navigation_translate:
-                                selectedFragment = BrailleTranslatorFragment.newInstance();
+                                mSelectedFragment = BrailleTranslatorFragment.getInstance();
                                 break;
 
                             case R.id.navigation_faces:
                                 //if(subsV3Manager.checkSubscribedMonth()){
                                 //if(model.checkSubscribedMonth()){
                                 if(model.checkSubscribedMonth()){
-                                    selectedFragment = FacesFragment.newInstance();
+                                    mSelectedFragment = FacesFragment.getInstance();
                                 }else{
-                                    selectedFragment = SubscribeFragment.newInstance();
+                                    mSelectedFragment = SubscribeFragment.getInstance();
                                 }
 
                                 //}else{
@@ -111,25 +108,25 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                                 break;
 
                             case R.id.navigation_settings:
-                                selectedFragment = AboutFragment.newInstance();
+                                mSelectedFragment = AboutFragment.getInstance();
                                 break;
                         }
-                        model.setmSeletedFragment(selectedFragment);
-                        //setFragment(selectedFragment);
+                        model.setmSeletedFragment(mSelectedFragment);
+                        //setFragment(mSelectedFragment);
 
                         return true;
                     }
                 });
 
 
-        /*if(selectedFragment == null){
+        /*if(mSelectedFragment == null){
             model.setmSeletedFragment(ReadFragment.newInstance());
         }*/
 
         model.getmSeletedFragment().observe(this, new Observer<Fragment>() {
             @Override
             public void onChanged(@Nullable Fragment fragment) {
-                //selectedFragment = fragment;
+                //mSelectedFragment = fragment;
                 //Timber.e("ENTRO Selected fragment");
 
                 setFragment(fragment);
@@ -188,11 +185,11 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                     model.setIsRecentlySuscribed(true);
 
                     //subsV3Manager.setRecentlySuscribed(true);
-                    selectedFragment = getSupportFragmentManager().findFragmentByTag("currentFragment");
-                    if(selectedFragment != null){
-                        //setFragment(selectedFragment);
+                    mSelectedFragment = getSupportFragmentManager().findFragmentByTag("currentFragment");
+                    if(mSelectedFragment != null){
+                        //setFragment(mSelectedFragment);
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.framelayout, selectedFragment, "currentFragment");
+                        transaction.replace(R.id.framelayout, mSelectedFragment, "currentFragment");
                         transaction.commitAllowingStateLoss();
                     }
                 }
@@ -209,11 +206,11 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
     protected void onResume() {
         super.onResume();
         //if(subsV3Manager.checkSubscribedMonth() != initialStatus){
-          //  setFragment(selectedFragment);
+          //  setFragment(mSelectedFragment);
         //}
 
-        if(model.checkSubscribedMonth() != suscrito){
-          setFragment(selectedFragment);
+        if(model.checkSubscribedMonth() != isSubscribed){
+          setFragment(mSelectedFragment);
 
         }
     }

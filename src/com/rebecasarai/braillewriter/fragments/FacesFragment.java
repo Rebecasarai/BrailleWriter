@@ -4,14 +4,12 @@ package com.rebecasarai.braillewriter.fragments;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -31,8 +29,8 @@ import com.google.android.gms.vision.face.FaceDetector;
 import com.rebecasarai.braillewriter.MainViewModel;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.subscription.SubscriptionManagerProvider;
-import com.rebecasarai.braillewriter.ui.face.FaceGraphic;
 import com.rebecasarai.braillewriter.ui.face.CameraSourcePreview;
+import com.rebecasarai.braillewriter.ui.face.FaceGraphic;
 import com.rebecasarai.braillewriter.ui.face.GraphicOverlay;
 
 import java.io.IOException;
@@ -53,6 +51,9 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
 
+    // Instance
+    private static FacesFragment INSTANCE = new FacesFragment();
+
     private static final int GMS_CODE = 9001;
     // permission request codes need to be < 256
     private static final int CAMERA_PERM_CODE = 2;
@@ -69,9 +70,11 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         // Required empty public constructor
     }
 
-    public static FacesFragment newInstance() {
-        FacesFragment fragment = new FacesFragment();
-        return fragment;
+    public static FacesFragment getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new FacesFragment();
+        }
+        return INSTANCE;
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

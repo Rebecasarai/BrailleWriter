@@ -35,6 +35,9 @@ import timber.log.Timber;
  */
 public class AboutFragment extends Fragment implements View.OnClickListener, TextToSpeech.OnInitListener {
 
+    // Instance
+    private static AboutFragment INSTANCE = new AboutFragment();
+
     private String toSpeak;
     private TextToSpeech tts;
     private View mLoadingView;
@@ -50,9 +53,11 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
         // Required empty public constructor
     }
 
-    public static AboutFragment newInstance() {
-        AboutFragment fragment = new AboutFragment();
-        return fragment;
+    public static AboutFragment getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new AboutFragment();
+        }
+        return INSTANCE;
     }
 
     @Override
@@ -72,15 +77,15 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
 
-                if(aBoolean){
+                if (aBoolean) {
 
-                    if(model.getIsRecentlySuscribed().getValue()){
+                    if (model.getIsRecentlySuscribed().getValue()) {
                         toSpeak = "Felicidades, se ha suscrito exitosamente.";
                         model.setIsRecentlySuscribed(false);
                     }
                     showManageSubs();
 
-                }else{
+                } else {
                     Subscription subsDetails = model.getMonthSubsDetails();
                     showSubDetails(subsDetails);
                 }
@@ -94,7 +99,6 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
 
         return root;
     }
-
 
 
     @Override
@@ -134,22 +138,16 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
         }*/
 
 
-
-
-        if(model.checkSubscribedMonth()){
+        if (model.checkSubscribedMonth()) {
             displayAccordingly();
         }
-
-
-
-
 
 
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.boxWhenSuscribed:
                 Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=com.rebecasarai.braillewriter");
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -158,7 +156,7 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
 
             case R.id.state_button_sub:
                 //Bundle buyIntentBundle= mSubscriptionProvider.getSubsV3Manager().buySubscription();
-                Bundle buyIntentBundle= model.buySubscription();
+                Bundle buyIntentBundle = model.buySubscription();
                 PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
                 try {
                     getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), 0, 0, 0);
@@ -170,7 +168,7 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
 
             case R.id.cuadro:
                 //mSubscriptionProvider.getSubsV3Manager().buySubscription();
-                Bundle buyIntentBundle2= model.buySubscription();
+                Bundle buyIntentBundle2 = model.buySubscription();
                 PendingIntent pendingIntent2 = buyIntentBundle2.getParcelable("BUY_INTENT");
                 try {
                     getActivity().startIntentSenderForResult(pendingIntent2.getIntentSender(), 1001, new Intent(), 0, 0, 0);
@@ -189,14 +187,14 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
 
             if (result == TextToSpeech.LANG_MISSING_DATA
                     || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Timber.e( "This Language is not supported");
+                Timber.e("This Language is not supported");
             } else {
                 tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
                 toSpeak = "";
             }
 
         } else {
-            Timber.e( "Initilization Failed!");
+            Timber.e("Initilization Failed!");
         }
 
     }
@@ -213,9 +211,10 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
 
     /**
      * Sets the Layout views
+     *
      * @param root Representing the layout view
      */
-    private void findViews(View root){
+    private void findViews(View root) {
 
         TextView myClickableUrl = (TextView) root.findViewById(R.id.link);
         myClickableUrl.setText("Para conocer más puede entrar en: \n http://braillewriter.es/politica-de-privacidad/");
@@ -233,6 +232,7 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
     /**
      * Sets the Subscriptions Manager Interface and sets the String to speak to
      * the regular one to guide the user.
+     *
      * @param billingProvider
      */
     public void onManageReadyBilling(SubscriptionManagerProvider billingProvider) {
@@ -246,7 +246,7 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
      * If its recently subscribed, meaning its the first fragment its getting into after subscribing,
      * the string to speak is to let him/her know its successfully subscribed.
      */
-    private void displayAccordingly(){
+    private void displayAccordingly() {
         /*if(mSubscriptionProvider.getSubsV3Manager().checkSubscribedMonth()){
             if(mSubscriptionProvider.getSubsV3Manager().isRecentlySuscribed()){
                 toSpeak = "Felicidades, se ha suscrito exitosamente.";
@@ -260,16 +260,14 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
         }*/
 
 
-
-
-        if(model.checkSubscribedMonth()){
-            if(model.getIsRecentlySuscribed().getValue()){
+        if (model.checkSubscribedMonth()) {
+            if (model.getIsRecentlySuscribed().getValue()) {
                 toSpeak = "Felicidades, se ha suscrito exitosamente.";
                 model.setIsRecentlySuscribed(false);
             }
             showManageSubs();
 
-        }else{
+        } else {
             Subscription subsDetails = model.getMonthSubsDetails();
             showSubDetails(subsDetails);
         }
@@ -277,13 +275,14 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
 
     /**
      * Shows the active and possible subscription details
+     *
      * @param subsDetails subscription Object representing the
      */
-    public void showSubDetails(Subscription subsDetails){
-        if(subsDetails != null){
+    public void showSubDetails(Subscription subsDetails) {
+        if (subsDetails != null) {
             button.setOnClickListener(this);
             cuadro.setOnClickListener(this);
-            if(subsDetails.getTitle() != null && subsDetails.getPrice() != null && subsDetails.getDescription() != null){
+            if (subsDetails.getTitle() != null && subsDetails.getPrice() != null && subsDetails.getDescription() != null) {
                 title.setText(subsDetails.getTitle());
                 price.setText(subsDetails.getPrice());
                 description.setText(subsDetails.getDescription());
@@ -296,12 +295,12 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
     /**
      * Sets the views if the user is already subscribed
      */
-    public void showManageSubs(){
-            button.setVisibility(View.GONE);
-            description.setText(R.string.manage_sub);
-            description.setMovementMethod(LinkMovementMethod.getInstance());
-            cuadro.setId(R.id.boxWhenSuscribed);
-            setWaitScreen(false);
+    public void showManageSubs() {
+        button.setVisibility(View.GONE);
+        description.setText(R.string.manage_sub);
+        description.setMovementMethod(LinkMovementMethod.getInstance());
+        cuadro.setId(R.id.boxWhenSuscribed);
+        setWaitScreen(false);
 
     }
 

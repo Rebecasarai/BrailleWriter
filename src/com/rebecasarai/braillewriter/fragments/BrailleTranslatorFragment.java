@@ -1,41 +1,42 @@
 package com.rebecasarai.braillewriter.fragments;
 
 
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.app.Fragment;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import timber.log.Timber;
-
 import com.rebecasarai.braillewriter.MainViewModel;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.braille.Convertor.FileManagerConvertor;
 
-import java.io.IOException;
 import java.util.Locale;
+
+import timber.log.Timber;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BrailleTranslatorFragment extends Fragment implements View.OnClickListener, TextToSpeech.OnInitListener, AdapterView.OnItemSelectedListener{
+public class BrailleTranslatorFragment extends Fragment implements View.OnClickListener, TextToSpeech.OnInitListener, AdapterView.OnItemSelectedListener {
 
 
     private static final int EDIT_REQUEST_CODE = 44;
     // Unique request code.
     private static final int WRITE_REQUEST_CODE = 43;
+
+    // Instance
+    private static BrailleTranslatorFragment INSTANCE = new BrailleTranslatorFragment();
+
     Spinner spinner;
     private String TAG;
     private Uri toTranslate;
@@ -47,9 +48,11 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
     }
 
 
-    public static BrailleTranslatorFragment newInstance() {
-        BrailleTranslatorFragment fragment = new BrailleTranslatorFragment();
-        return fragment;
+    public static BrailleTranslatorFragment getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new BrailleTranslatorFragment();
+        }
+        return INSTANCE;
     }
 
     @Override
@@ -71,8 +74,8 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
         MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         toSpeak = "Ha entrado a traductor a braille";
 
-        if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
-            toSpeak="";
+        if (model.getmSameFragment().getValue() != null && model.getmSameFragment().getValue()) {
+            toSpeak = "";
             model.getmSameFragment().setValue(false);
         }
 
@@ -97,15 +100,15 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
             Uri uri = null;
             if (resultData != null) {
                 uri = resultData.getData();
-                Timber.i( "Uri: " + uri.toString());
+                Timber.i("Uri: " + uri.toString());
 
                 String languageSelected = spinner.getSelectedItem().toString();
                 FileManagerConvertor fileManagerConvertor = new FileManagerConvertor(getContext());
                 String translated = fileManagerConvertor.readTextFromUri(uri, languageSelected);
-                if(!translated.equals("")){
+                if (!translated.equals("")) {
                     fileManagerConvertor.writeToFile(translated);
-                }else{
-                    toSpeak="";
+                } else {
+                    toSpeak = "";
                 }
 
             }
@@ -122,7 +125,7 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.convertFileButton:
 
                 openDocument();
@@ -131,6 +134,7 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
 
         }
     }
+
     @Override
     public void onDestroy() {
 
@@ -142,7 +146,6 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
     }
 
 
-
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
@@ -151,19 +154,16 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
 
             if (result == TextToSpeech.LANG_MISSING_DATA
                     || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Timber.e( "This Language is not supported");
+                Timber.e("This Language is not supported");
             } else {
                 tts.speak("Ha entrado a traductor a braille", TextToSpeech.QUEUE_FLUSH, null);
-                toSpeak="";
+                toSpeak = "";
             }
 
         } else {
-            Timber.e( "Initilization Failed!");
+            Timber.e("Initilization Failed!");
         }
     }
-
-
-
 
 
     /**

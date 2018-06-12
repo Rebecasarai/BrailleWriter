@@ -41,7 +41,8 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
 
     private List<ObjectRecognition> resultsAudio;
 
-
+    // INSTANCE
+    private static ObjectRecognitionFragment INSTANCE = new ObjectRecognitionFragment();
     // A TextToSpeech engine for speaking a String value.
     private TextToSpeech tts;
     private String toSpeak;
@@ -77,12 +78,11 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
     private static final String INPUT_NAME = "input";
     private static final String OUTPUT_NAME = "output";
 
-
     private static final String MODEL_FILE = "file:///android_asset/tensorflow_inception_graph.pb";
     private static final String LABEL_FILE =
             "file:///android_asset/imagenet_comp_graph_label_strings.txt";
 
-
+    //TODO: Should this be true then ?
     private static final boolean MAINTAIN_ASPECT = false;
 
     private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
@@ -251,9 +251,11 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
         }
     }
 
-    public static ObjectRecognitionFragment newInstance() {
-        ObjectRecognitionFragment fragment = new ObjectRecognitionFragment();
-        return fragment;
+    public static ObjectRecognitionFragment getInstance() {
+        if(INSTANCE == null){
+            INSTANCE = new ObjectRecognitionFragment();
+        }
+        return INSTANCE;
     }
 
     @Override
