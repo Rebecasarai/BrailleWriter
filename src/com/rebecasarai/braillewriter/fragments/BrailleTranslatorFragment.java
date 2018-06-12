@@ -1,10 +1,13 @@
 package com.rebecasarai.braillewriter.fragments;
 
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +19,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import timber.log.Timber;
+
+import com.rebecasarai.braillewriter.MainViewModel;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.braille.Convertor.FileManagerConvertor;
 
@@ -52,6 +57,7 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_convertor, container, false);
 
+
         spinner = (Spinner) root.findViewById(R.id.languagesSpinnerId);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.languages_string_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -62,7 +68,14 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
         mConvertFileButton.setOnClickListener(this);
         TAG = root.getClass().getName();
 
+        MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         toSpeak = "Ha entrado a traductor a braille";
+
+        if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
+            toSpeak="";
+            model.getmSameFragment().setValue(false);
+        }
+
         tts = new TextToSpeech(getContext(), this);
 
 

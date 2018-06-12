@@ -1,6 +1,7 @@
 package com.rebecasarai.braillewriter.subscription;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
@@ -40,34 +41,40 @@ public class SubscriptionManager {
     private Activity mActivity;
     private Gson gson = new Gson();
     private  boolean isRecentlySuscribed;
+    ServiceConnection mServiceConn;
 
-    /**
-     * The Service Connection to being able to conect with the In App Android Billing API
-     */
-    private ServiceConnection mServiceConn = new ServiceConnection() {
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mService = null;
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mService = IInAppBillingService.Stub.asInterface(service);
-        }
-    };
     private final String subscriptionID =  "mothly_sub";	// The Google Play ID for BW subscriptions
 
 
-    public SubscriptionManager(Activity activity) {
-        this.context = activity.getApplicationContext();
+    public SubscriptionManager(Activity activity, Application app) {
+        createService();
+        context = app.getApplicationContext();
         tag = "In App Billing";
         mActivity = activity;
 
         Intent billingIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
         billingIntent.setPackage("com.android.vending");
-        mIsBinded = context.bindService(billingIntent, mServiceConn, Context.BIND_AUTO_CREATE);
+        mIsBinded = app.bindService(billingIntent, mServiceConn, Context.BIND_AUTO_CREATE);
 
        Timber.i( "bindService - return " + String.valueOf(mIsBinded));
+    }
+
+    /**
+     * The Service Connection to being able to conect with the In App Android Billing API
+     */
+    public void createService(){
+        mServiceConn = new ServiceConnection() {
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                mService = null;
+            }
+
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mService = IInAppBillingService.Stub.asInterface(service);
+            }
+        };
+
     }
 
     /**
@@ -124,7 +131,7 @@ public class SubscriptionManager {
     private Subscription getSKUDetails(String productSKUID){
         if (!mIsBinded) return null;
         if (mService == null) return null;
-        Subscription skuObject = new Subscription();
+        Subscription skuObject = new Subscription("","","","","");
 
         ArrayList<String> skuList = new ArrayList<String>();
         skuList.add(productSKUID);
@@ -180,8 +187,8 @@ public class SubscriptionManager {
      * This is called when the user press the button to suscribe being either on Faces Fragment or About
      * Pases the current ProductID to buySKU().
      */
-    public void buySubscription(){
-        buySKU(subscriptionID);
+    public Bundle buySubscription(){
+        return buySKU(subscriptionID);
     }
 
     /**
@@ -192,27 +199,25 @@ public class SubscriptionManager {
      * at the onActivityOnResult
      * @param sku String Representing the Sku ID of the product to buy.
      */
-    private void buySKU(String sku){
-        if (!mIsBinded) return;
-        if (mService == null) return;
+    private Bundle buySKU(String sku){
+        if (!mIsBinded) return null;
+        if (mService == null) return null;
+        Bundle buyIntentBundle = null;
         try{
-            Bundle buyIntentBundle = mService.getBuyIntent(3, context.getPackageName(), sku, "subs", "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
+            buyIntentBundle = mService.getBuyIntent(3, context.getPackageName(), sku, "subs", "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
             int response = buyIntentBundle.getInt("RESPONSE_CODE");
 
             Timber.i(tag, "getBuyIntent() RESPONSE_CODE: " + String.valueOf(response));
 
             if (response != 0) notifyError();
 
-            PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
-            mActivity.startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), 0, 0, 0);
 
             } catch (RemoteException e) {
                 e.printStackTrace();
 
                 Timber.w(tag, "getBuyIntent() failed");
-            } catch (IntentSender.SendIntentException e) {
-                e.printStackTrace();
-        }
+            }
+        return buyIntentBundle;
     }
 
     private void notifyError() {
@@ -233,7 +238,18 @@ public class SubscriptionManager {
     public void destroy() {
         Timber.d("Destroying the manager.");
 
+
     }
+
+    public void doUnbindService() {
+        /*if (mIsBinded) {
+            // Detach our existing connection.
+            context.unbindService(mServiceConn);
+            mIsBinded = false;
+        }*/
+    }
+
+
 
 
 }

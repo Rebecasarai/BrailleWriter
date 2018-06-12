@@ -1,14 +1,18 @@
 package com.rebecasarai.braillewriter.activities;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.rebecasarai.braillewriter.MainViewModel;
 import com.rebecasarai.braillewriter.fragments.SubscribeFragment;
 
 import com.rebecasarai.braillewriter.BuildConfig;
@@ -18,6 +22,7 @@ import com.rebecasarai.braillewriter.fragments.BrailleTranslatorFragment;
 import com.rebecasarai.braillewriter.fragments.FacesFragment;
 import com.rebecasarai.braillewriter.fragments.ReadFragment;
 import com.rebecasarai.braillewriter.fragments.ObjectRecognitionFragment;
+import com.rebecasarai.braillewriter.subscription.Subscription;
 import com.rebecasarai.braillewriter.subscription.SubscriptionManager;
 import com.rebecasarai.braillewriter.subscription.SubscriptionManagerProvider;
 
@@ -32,6 +37,8 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
     private SubscriptionManager subsV3Manager;
     private Fragment selectedFragment;
     private boolean initialStatus;
+    private boolean suscrito;
+     MainViewModel model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +50,26 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         }
-        subsV3Manager = new SubscriptionManager(this);
-        initialStatus = subsV3Manager.checkSubscribedMonth();
+
+        //subsV3Manager = new SubscriptionManager(this,getApplication());
+        if(savedInstanceState == null){
+            //subsV3Manager.createService();
+        }
+
+        //subsV3Manager.createService();
+        //initialStatus = subsV3Manager.checkSubscribedMonth();
+
+
+        model = ViewModelProviders.of(this).get(MainViewModel.class);
+
+        model.getIsSubscribed().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                if(aBoolean != null){
+                    suscrito = aBoolean;
+                }
+            }
+        });
 
         bottomNavigationView.setOnNavigationItemSelectedListener
                 (new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -64,11 +89,20 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                                 break;
 
                             case R.id.navigation_faces:
-                                if(subsV3Manager.checkSubscribedMonth()){
+                                //if(subsV3Manager.checkSubscribedMonth()){
+                                //if(model.checkSubscribedMonth()){
+                                if(suscrito){
                                     selectedFragment = FacesFragment.newInstance();
                                 }else{
                                     selectedFragment = SubscribeFragment.newInstance();
                                 }
+
+                                //}else{
+
+                                //}
+
+                                //}else{
+                                //}
 
                                 break;
 
@@ -76,12 +110,36 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                                 selectedFragment = AboutFragment.newInstance();
                                 break;
                         }
+                        model.setmSeletedFragment(selectedFragment);
                         setFragment(selectedFragment);
 
                         return true;
                     }
                 });
-        setFragment(ReadFragment.newInstance());
+
+
+        model.getmSeletedFragment().observe(this, new Observer<Fragment>() {
+            @Override
+            public void onChanged(@Nullable Fragment fragment) {
+                selectedFragment = fragment;
+                Timber.e("ENTRO Selected fragment");
+                //setFragment(selectedFragment);
+            }
+        });
+
+
+        model.getmSameFragment().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                Timber.e("ENTRO SAME FRAGMENT");
+            }
+        });
+
+        if(selectedFragment == null){
+            model.setmSeletedFragment(ReadFragment.newInstance());
+        }
+
+
     }
 
 
@@ -96,8 +154,10 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
 
     @Override
     protected void onDestroy() {
+
+        //subsV3Manager.doUnbindService();
         super.onDestroy();
-        subsV3Manager.destroy();
+
     }
 
     @Override
@@ -118,7 +178,7 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                     String sku = jo.getString("productId");
                     Timber.e("You have bought the " + sku + ". Excellent choice, adventurer!");
 
-                    subsV3Manager.setRecentlySuscribed(true);
+                    //subsV3Manager.setRecentlySuscribed(true);
                     selectedFragment = getSupportFragmentManager().findFragmentByTag("currentFragment");
                     if(selectedFragment != null){
                         //setFragment(selectedFragment);
@@ -139,8 +199,18 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
     @Override
     protected void onResume() {
         super.onResume();
-        if(subsV3Manager.checkSubscribedMonth() != initialStatus){
-            setFragment(selectedFragment);
+        //if(subsV3Manager.checkSubscribedMonth() != initialStatus){
+          //  setFragment(selectedFragment);
+        //}
+
+        if(model.checkSubscribedMonth() != initialStatus){
+          //setFragment(selectedFragment);
+
         }
     }
+
+
+
+
+
 }

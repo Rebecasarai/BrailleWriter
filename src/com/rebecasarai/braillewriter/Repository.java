@@ -1,12 +1,7 @@
 package com.rebecasarai.braillewriter;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.PendingIntent;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -15,95 +10,54 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.speech.tts.TextToSpeech;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.widget.Toast;
 
 import com.android.vending.billing.IInAppBillingService;
-import com.google.firebase.database.MutableData;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.rebecasarai.braillewriter.fragments.ReadFragment;
 import com.rebecasarai.braillewriter.subscription.Subscription;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import timber.log.Timber;
 
-public class MainViewModel extends AndroidViewModel {
-
-
-    private Repository mRepository;
-    private MutableLiveData<Fragment> mSeletedFragment = new MutableLiveData<>();
-    private MutableLiveData<TextToSpeech> tts = new MutableLiveData<>();
-    private MutableLiveData<Subscription> mSubscription = new MutableLiveData<>();
-    private MutableLiveData<Boolean> mSameFragment = new MutableLiveData<>();
-    private MutableLiveData<ServiceConnection> mServiceConn = new MutableLiveData<>();
-
-
+public class Repository {
     private boolean mIsBinded;
+    private Context context;
     private String tag;
-    Application app;
     private IInAppBillingService mService;
+    private Activity mActivity;
     private Gson gson = new Gson();
-    private MutableLiveData<Boolean> isRecentlySuscribed = new MutableLiveData<>();
-    private final String subscriptionID =  "mothly_sub";	// The Google Play ID for BW subscriptions
-
-    private MutableLiveData<Boolean> isSubscribed = new MutableLiveData<>();
-
-
-
-
-
-    public MainViewModel(@NonNull Application application) {
-        super(application);
-        createService();
-        app = application;
-        //context = application.getApplicationContext();
-        tag = "In App Billing";
-
-        Intent billingIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
-        billingIntent.setPackage("com.android.vending");
-        mIsBinded = app.bindService(billingIntent, mServiceConn.getValue(), Context.BIND_AUTO_CREATE);
-
-        Timber.i( "bindService - return " + String.valueOf(mIsBinded));
-    }
-
-
-    public MutableLiveData<Boolean> getIsSubscribed() {
-        if(isSubscribed == null){
-            isSubscribed.setValue(false);
-        }
-        Boolean subscribed = checkSubscribedMonth();
-        isSubscribed.setValue(subscribed);
-        return isSubscribed;
-    }
-
+    private  boolean isRecentlySuscribed;
 
     /**
      * The Service Connection to being able to conect with the In App Android Billing API
      */
-    public void createService(){
-        mServiceConn.setValue(new ServiceConnection() {
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                mService = null;
-            }
+    private ServiceConnection mServiceConn = new ServiceConnection() {
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mService = null;
+        }
 
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                mService = IInAppBillingService.Stub.asInterface(service);
-            }
-        });
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mService = IInAppBillingService.Stub.asInterface(service);
+        }
+    };
+    private final String subscriptionID =  "mothly_sub";	// The Google Play ID for BW subscriptions
 
+
+    public Repository(Activity activity) {
+        this.context = activity.getApplicationContext();
+        tag = "In App Billing";
+        mActivity = activity;
+
+        Intent billingIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
+        billingIntent.setPackage("com.android.vending");
+        mIsBinded = context.bindService(billingIntent, mServiceConn, Context.BIND_AUTO_CREATE);
+
+        Timber.i( "bindService - return " + String.valueOf(mIsBinded));
     }
-
-
-
-
-
 
     /**
      * Checks if the current user is subscribed to the BW monthly subscription
@@ -117,13 +71,13 @@ public class MainViewModel extends AndroidViewModel {
 
         Bundle ownedItems;
         try {
-            ownedItems = mService.getPurchases(3, app.getPackageName(), "subs", null);
+            ownedItems = mService.getPurchases(3, context.getPackageName(), "subs", null);
 
             Timber.i( "getPurchases() - success return Bundle");
 
         } catch (RemoteException e) {
             e.printStackTrace();
-            Toast.makeText(app, "getPurchases - fail!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "getPurchases - fail!", Toast.LENGTH_SHORT).show();
             Timber.w(tag, "getPurchases() - fail!");
             return false;
         }
@@ -168,7 +122,7 @@ public class MainViewModel extends AndroidViewModel {
 
         Bundle skuDetails;
         try {
-            skuDetails = mService.getSkuDetails(3, app.getPackageName(), "subs", querySkus);
+            skuDetails = mService.getSkuDetails(3, context.getPackageName(), "subs", querySkus);
         } catch (RemoteException e) {
             e.printStackTrace();
             Timber.e(tag, "getSkuDetails() failed");
@@ -215,8 +169,8 @@ public class MainViewModel extends AndroidViewModel {
      * This is called when the user press the button to suscribe being either on Faces Fragment or About
      * Pases the current ProductID to buySKU().
      */
-    public Bundle buySubscription(){
-        return buySKU(subscriptionID);
+    public void buySubscription(){
+        buySKU(subscriptionID);
     }
 
     /**
@@ -227,82 +181,48 @@ public class MainViewModel extends AndroidViewModel {
      * at the onActivityOnResult
      * @param sku String Representing the Sku ID of the product to buy.
      */
-    private Bundle buySKU(String sku){
-
-        if (!mIsBinded) return null;
-        if (mService == null) return null;
-        Bundle buyIntentBundle = null;
+    private void buySKU(String sku){
+        if (!mIsBinded) return;
+        if (mService == null) return;
         try{
-            buyIntentBundle = mService.getBuyIntent(3, app.getPackageName(), sku, "subs", "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
+            Bundle buyIntentBundle = mService.getBuyIntent(3, context.getPackageName(), sku, "subs", "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
             int response = buyIntentBundle.getInt("RESPONSE_CODE");
 
             Timber.i(tag, "getBuyIntent() RESPONSE_CODE: " + String.valueOf(response));
 
             if (response != 0) notifyError();
+
+            PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
+            mActivity.startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), 0, 0, 0);
+
         } catch (RemoteException e) {
             e.printStackTrace();
 
             Timber.w(tag, "getBuyIntent() failed");
+        } catch (IntentSender.SendIntentException e) {
+            e.printStackTrace();
         }
-        return buyIntentBundle;
     }
 
     private void notifyError() {
     }
 
 
-
-    public MutableLiveData<Boolean> getIsRecentlySuscribed() {
-        if(isRecentlySuscribed == null){
-            isRecentlySuscribed.setValue(false);
-        }
+    public boolean isRecentlySuscribed() {
         return isRecentlySuscribed;
     }
 
-    public void setIsRecentlySuscribed(Boolean isRecentlySuscribed) {
-        this.isRecentlySuscribed.setValue(isRecentlySuscribed);
+    public void setRecentlySuscribed(boolean recentlySuscribed) {
+        isRecentlySuscribed = recentlySuscribed;
     }
 
+    /**
+     * Clear the resources
+     */
+    public void destroy() {
+        Timber.d("Destroying the manager.");
 
-
-
-
-
-
-
-
-
-
-    public MutableLiveData<Boolean> getmSameFragment() {
-        if(mSameFragment == null){
-            mSameFragment.setValue(false);
-        }
-        return mSameFragment;
     }
-
-
-
-    public void setmSameFragment(Boolean mSameFragment) {
-        this.mSameFragment.setValue(mSameFragment);
-    }
-
-
-    public MutableLiveData<Fragment> getmSeletedFragment() {
-        if(mSeletedFragment == null){
-            mSeletedFragment.setValue(ReadFragment.newInstance());
-        }
-        return mSeletedFragment;
-    }
-
-    public void setmSeletedFragment(Fragment seletedFragment) {
-        mSameFragment.setValue(false);
-
-        if(mSeletedFragment.getValue() == seletedFragment){
-            mSameFragment.setValue(true);
-        }
-
-        this.mSeletedFragment.setValue(seletedFragment);
-    }
-
 
 }
+

@@ -1,6 +1,7 @@
 package com.rebecasarai.braillewriter.fragments;
 
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.rebecasarai.braillewriter.MainViewModel;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.subscription.Subscription;
 import com.rebecasarai.braillewriter.subscription.SubscriptionManagerProvider;
@@ -32,6 +34,7 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
 
     public TextView title, description;
     public Button button;
+    MainViewModel model;
 
     public static SubscribeFragment newInstance() {
         SubscribeFragment fragment = new SubscribeFragment();
@@ -52,6 +55,7 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
         setWaitScreen(true);
         onManageReadyBilling((SubscriptionManagerProvider) getActivity());
 
+        model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         tts = new TextToSpeech(getContext(), this);
 
         return root;
@@ -69,6 +73,10 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
     public void onManageReadyBilling(SubscriptionManagerProvider billingProvider) {
         mSubscriptionProvider = billingProvider;
         toSpeak = "Prueba reconocer rostros y emociones gratis por 12 días";
+//        if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
+    //        toSpeak="";
+      //      model.getmSameFragment().setValue(false);
+  //      }
         Subscription subsDetails = mSubscriptionProvider.getSubsV3Manager().getMonthSubsDetails();
         showSubDetails(subsDetails);
 

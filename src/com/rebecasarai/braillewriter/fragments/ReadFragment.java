@@ -3,11 +3,14 @@ package com.rebecasarai.braillewriter.fragments;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -21,6 +24,7 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.rebecasarai.braillewriter.MainViewModel;
 import com.rebecasarai.braillewriter.ui.OCR.OCRManager;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.ui.OCR.CameraSource;
@@ -78,10 +82,12 @@ public class ReadFragment extends Fragment implements View.OnTouchListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
 
         View rootview = inflater.inflate(R.layout.fragment_read, container, false);
+
+        MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+
+
         mPreview = (CameraSourcePreview) rootview.findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay<OcrGraphic>) rootview.findViewById(R.id.graphicOverlay);
 
@@ -101,6 +107,28 @@ public class ReadFragment extends Fragment implements View.OnTouchListener {
         }
 
         toSpeak= "Ha entrado en leer";
+
+        /*if(model.getmSeletedFragment().getValue().getClass().equals(this.getClass())){
+            toSpeak = "";
+        }*/
+
+        /*if(model.getmSameFragment().getValue()){
+            toSpeak="";
+            model.setmSameFragment(false);
+        }*/
+
+        model.getmSameFragment().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+                Timber.e("ENTRO SAME FRAGMENT");
+            }
+        });
+        model.getmSeletedFragment().observe(this, new Observer<Fragment>() {
+            @Override
+            public void onChanged(@Nullable Fragment fragment) {
+                Timber.e("ENTRO Selected fragment");
+            }
+        });
 
         tts2= new TextToSpeech(getContext(),new TextToSpeech.OnInitListener() {
             @Override

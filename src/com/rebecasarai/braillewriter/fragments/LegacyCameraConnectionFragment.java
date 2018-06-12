@@ -71,7 +71,6 @@ public class LegacyCameraConnectionFragment extends Fragment {
     outState.putInt("layout", layout);
     outState.putSize("desiredSize", desiredSize);
 
-
     // call superclass to save any view hierarchy
     super.onSaveInstanceState(outState);
   }

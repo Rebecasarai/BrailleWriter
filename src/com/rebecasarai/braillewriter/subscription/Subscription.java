@@ -29,9 +29,6 @@ public class Subscription {
         this.type = type;
     }
 
-    public Subscription() {
-    }
-
     public String getProductId() {
         return productId;
     }

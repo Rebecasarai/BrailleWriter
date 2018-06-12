@@ -4,11 +4,14 @@ package com.rebecasarai.braillewriter.fragments;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -25,6 +28,7 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.rebecasarai.braillewriter.MainViewModel;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.subscription.SubscriptionManagerProvider;
 import com.rebecasarai.braillewriter.ui.face.FaceGraphic;
@@ -82,6 +86,13 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         if(mSubscriptionProvider.getSubsV3Manager().isRecentlySuscribed()){
             toSpeak = "Felicidades, se ha suscrito exitosamente. Reconozca emociones";
             mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
+        }
+        toSpeak = "Ha entrado a traductor a braille";
+
+        MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
+            toSpeak="";
+            model.getmSameFragment().setValue(false);
         }
         tts = new TextToSpeech(getContext(), this);
 
