@@ -94,7 +94,8 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         //model.getIsRecentlySuscribed().observe();
         if(model.getIsRecentlySuscribed().getValue()){
             toSpeak = "Felicidades, se ha suscrito exitosamente. Reconozca emociones";
-            mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
+//            mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
+            model.setIsRecentlySuscribed(true);
         }
 
         if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
