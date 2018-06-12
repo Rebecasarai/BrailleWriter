@@ -81,15 +81,22 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         mFaceDetected = false;
         findViews(rootview);
         toSpeak = "Ha entrado a Reconocimiento de rostros";
-
+/*
         mSubscriptionProvider = (SubscriptionManagerProvider) getActivity();
         if(mSubscriptionProvider.getSubsV3Manager().isRecentlySuscribed()){
             toSpeak = "Felicidades, se ha suscrito exitosamente. Reconozca emociones";
             mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
-        }
-        toSpeak = "Ha entrado a traductor a braille";
+        }*/
+
+
 
         MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        //model.getIsRecentlySuscribed().observe();
+        if(model.getIsRecentlySuscribed().getValue()){
+            toSpeak = "Felicidades, se ha suscrito exitosamente. Reconozca emociones";
+            mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
+        }
+
         if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
             toSpeak="";
             model.getmSameFragment().setValue(false);

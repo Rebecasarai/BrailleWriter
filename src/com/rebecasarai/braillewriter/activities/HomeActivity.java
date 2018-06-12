@@ -62,6 +62,10 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
 
         model = ViewModelProviders.of(this).get(MainViewModel.class);
 
+        if(model.getIsSubscribed().getValue()){
+            suscrito = true;
+        }
+
         model.getIsSubscribed().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
@@ -91,7 +95,7 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                             case R.id.navigation_faces:
                                 //if(subsV3Manager.checkSubscribedMonth()){
                                 //if(model.checkSubscribedMonth()){
-                                if(suscrito){
+                                if(model.checkSubscribedMonth()){
                                     selectedFragment = FacesFragment.newInstance();
                                 }else{
                                     selectedFragment = SubscribeFragment.newInstance();
@@ -111,19 +115,24 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                                 break;
                         }
                         model.setmSeletedFragment(selectedFragment);
-                        setFragment(selectedFragment);
+                        //setFragment(selectedFragment);
 
                         return true;
                     }
                 });
 
 
+        /*if(selectedFragment == null){
+            model.setmSeletedFragment(ReadFragment.newInstance());
+        }*/
+
         model.getmSeletedFragment().observe(this, new Observer<Fragment>() {
             @Override
             public void onChanged(@Nullable Fragment fragment) {
-                selectedFragment = fragment;
-                Timber.e("ENTRO Selected fragment");
-                //setFragment(selectedFragment);
+                //selectedFragment = fragment;
+                //Timber.e("ENTRO Selected fragment");
+
+                setFragment(fragment);
             }
         });
 
@@ -135,9 +144,6 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
             }
         });
 
-        if(selectedFragment == null){
-            model.setmSeletedFragment(ReadFragment.newInstance());
-        }
 
 
     }
@@ -178,6 +184,9 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                     String sku = jo.getString("productId");
                     Timber.e("You have bought the " + sku + ". Excellent choice, adventurer!");
 
+
+                    model.setIsRecentlySuscribed(true);
+
                     //subsV3Manager.setRecentlySuscribed(true);
                     selectedFragment = getSupportFragmentManager().findFragmentByTag("currentFragment");
                     if(selectedFragment != null){
@@ -203,8 +212,8 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
           //  setFragment(selectedFragment);
         //}
 
-        if(model.checkSubscribedMonth() != initialStatus){
-          //setFragment(selectedFragment);
+        if(model.checkSubscribedMonth() != suscrito){
+          setFragment(selectedFragment);
 
         }
     }

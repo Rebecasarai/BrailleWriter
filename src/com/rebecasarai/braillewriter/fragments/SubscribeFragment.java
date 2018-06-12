@@ -1,9 +1,14 @@
 package com.rebecasarai.braillewriter.fragments;
 
 
+import android.app.PendingIntent;
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.content.IntentSender;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +35,7 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
     private TextToSpeech tts;
     private View mLoadingView;
     private TextView mErrorTextView;
-    private SubscriptionManagerProvider mSubscriptionProvider;
+    //private SubscriptionManagerProvider mSubscriptionProvider;
 
     public TextView title, description;
     public Button button;
@@ -53,9 +58,24 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
         findViews(root);
 
         setWaitScreen(true);
-        onManageReadyBilling((SubscriptionManagerProvider) getActivity());
+        //onManageReadyBilling((SubscriptionManagerProvider) getActivity());
 
         model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        toSpeak = "Ha entrado a configuración";
+        model.getIsSubscribed().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+
+                toSpeak = "Prueba reconocer rostros y emociones gratis por 12 días";
+                if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
+                    toSpeak="";
+                    model.getmSameFragment().setValue(false);
+                }
+                Subscription subsDetails = model.getMonthSubsDetails();
+                showSubDetails(subsDetails);
+
+            }
+        });
         tts = new TextToSpeech(getContext(), this);
 
         return root;
@@ -70,17 +90,17 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
 
     }
 
-    public void onManageReadyBilling(SubscriptionManagerProvider billingProvider) {
+    /*public void onManageReadyBilling(SubscriptionManagerProvider billingProvider) {
         mSubscriptionProvider = billingProvider;
         toSpeak = "Prueba reconocer rostros y emociones gratis por 12 días";
-//        if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
-    //        toSpeak="";
-      //      model.getmSameFragment().setValue(false);
-  //      }
+       if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
+            toSpeak="";
+            model.getmSameFragment().setValue(false);
+       }
         Subscription subsDetails = mSubscriptionProvider.getSubsV3Manager().getMonthSubsDetails();
         showSubDetails(subsDetails);
 
-    }
+    }*/
 
     public void showSubDetails(Subscription subsDetails){
         button.setOnClickListener(this);
@@ -102,11 +122,25 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
         switch (v.getId()){
 
             case R.id.state_button_sub_f:
-                mSubscriptionProvider.getSubsV3Manager().buySubscription();
+                //mSubscriptionProvider.getSubsV3Manager().buySubscription();
+                Bundle buyIntentBundle= model.buySubscription();
+                PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
+                try {
+                    getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), 0, 0, 0);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
                 break;
 
             case R.id.cuadro:
-                mSubscriptionProvider.getSubsV3Manager().buySubscription();
+                //mSubscriptionProvider.getSubsV3Manager().buySubscription();
+                Bundle buyIntentBundle2= model.buySubscription();
+                PendingIntent pendingIntent2 = buyIntentBundle2.getParcelable("BUY_INTENT");
+                try {
+                    getActivity().startIntentSenderForResult(pendingIntent2.getIntentSender(), 1001, new Intent(), 0, 0, 0);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }

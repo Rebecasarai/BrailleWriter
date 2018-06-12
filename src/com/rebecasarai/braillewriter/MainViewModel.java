@@ -63,11 +63,14 @@ public class MainViewModel extends AndroidViewModel {
         app = application;
         //context = application.getApplicationContext();
         tag = "In App Billing";
+        isRecentlySuscribed.setValue(false);
 
         Intent billingIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
         billingIntent.setPackage("com.android.vending");
         mIsBinded = app.bindService(billingIntent, mServiceConn.getValue(), Context.BIND_AUTO_CREATE);
 
+        isSubscribed.setValue(checkSubscribedMonth());
+        mSeletedFragment.setValue(ReadFragment.newInstance());
         Timber.i( "bindService - return " + String.valueOf(mIsBinded));
     }
 
@@ -76,8 +79,7 @@ public class MainViewModel extends AndroidViewModel {
         if(isSubscribed == null){
             isSubscribed.setValue(false);
         }
-        Boolean subscribed = checkSubscribedMonth();
-        isSubscribed.setValue(subscribed);
+        isSubscribed.setValue(checkSubscribedMonth());
         return isSubscribed;
     }
 
