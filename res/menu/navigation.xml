@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/navigation_read"
-        android:icon="@drawable/ic_chat_black_24dp"
+        android:icon="@drawable/ic_message_black_24dp"
         android:title="@string/title_home"
         app:itemBackground="@color/colorPrimary"
         android:iconTint="@color/colorPrimaryDark"
@@ -23,7 +23,7 @@
         android:id="@+id/navigation_recognite"
         app:showAsAction="always"
         app:itemBackground="@color/colorPrimary"
-        android:icon="@drawable/ic_panorama_black_24dp"
+        android:icon="@drawable/ic_photo_size_select_actual_black_24dp"
         android:title="@string/title_dashboard" />
 
 

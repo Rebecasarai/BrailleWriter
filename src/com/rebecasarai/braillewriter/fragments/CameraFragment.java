@@ -374,7 +374,8 @@ public abstract class CameraFragment extends Fragment implements ImageReader.OnI
             fragment = camera2Fragment;
         } else {
             fragment =
-                    new LegacyCameraConnectionFragment(this, getLayoutId(), getDesiredPreviewFrameSize());
+                    //new LegacyCameraConnectionFragment(this, getLayoutId(), getDesiredPreviewFrameSize());
+                    new LegacyCameraConnectionFragment(this, getLayoutId(), getDesiredPreviewFrameSize(), 90 - getScreenOrientation());
         }
 
         getChildFragmentManager()
