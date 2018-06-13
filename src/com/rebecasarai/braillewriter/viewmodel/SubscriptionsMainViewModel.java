@@ -1,4 +1,4 @@
-package com.rebecasarai.braillewriter;
+package com.rebecasarai.braillewriter.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.android.vending.billing.IInAppBillingService;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import com.rebecasarai.braillewriter.Repository;
 import com.rebecasarai.braillewriter.fragments.ReadFragment;
 import com.rebecasarai.braillewriter.subscription.Subscription;
 
@@ -26,20 +27,11 @@ import java.util.ArrayList;
 
 import timber.log.Timber;
 
-public class MainViewModel extends AndroidViewModel {
-
-
+public class SubscriptionsMainViewModel extends AndroidViewModel {
     private Repository mRepository;
-    private MutableLiveData<Fragment> mSeletedFragment = new MutableLiveData<>();
-    private MutableLiveData<TextToSpeech> tts = new MutableLiveData<>();
-    private MutableLiveData<Subscription> mSubscription = new MutableLiveData<>();
-    private MutableLiveData<Boolean> mSameFragment = new MutableLiveData<>();
-    private MutableLiveData<ServiceConnection> mServiceConn = new MutableLiveData<>();
-    private boolean mFirstTime = true;
-
-
     private boolean mIsBinded;
     private String tag;
+    private MutableLiveData<ServiceConnection> mServiceConn = new MutableLiveData<>();
     Application app;
     private IInAppBillingService mService;
     private Gson gson = new Gson();
@@ -49,7 +41,7 @@ public class MainViewModel extends AndroidViewModel {
     private MutableLiveData<Boolean> isSubscribed = new MutableLiveData<>();
 
 
-    public MainViewModel(@NonNull Application application) {
+    public SubscriptionsMainViewModel(@NonNull Application application) {
         super(application);
         createService();
         app = application;
@@ -62,9 +54,6 @@ public class MainViewModel extends AndroidViewModel {
         mIsBinded = app.bindService(billingIntent, mServiceConn.getValue(), Context.BIND_AUTO_CREATE);
 
         isSubscribed.setValue(checkSubscribedMonth());
-        mSeletedFragment.setValue(ReadFragment.getInstance());
-        mSameFragment.setValue(false);
-        mFirstTime = true;
         Timber.i("bindService - return " + String.valueOf(mIsBinded));
     }
 
@@ -259,39 +248,4 @@ public class MainViewModel extends AndroidViewModel {
     }
 
 
-    public MutableLiveData<Boolean>getmSameFragment() {
-        return mSameFragment;
-    }
-
-
-    public void setmSameFragment(Boolean mSameFragment) {
-        this.mSameFragment.setValue(mSameFragment);
-    }
-
-
-    public MutableLiveData<Fragment> getmSeletedFragment() {
-        if (mSeletedFragment == null) {
-            mSeletedFragment.setValue(ReadFragment.getInstance());
-        }
-        return mSeletedFragment;
-    }
-
-    public void setmSeletedFragment(Fragment seletedFragment) {
-        mFirstTime = false;
-        mSameFragment.setValue(false);
-
-        if (mSeletedFragment.getValue().getClass().toString().toUpperCase().equals(seletedFragment.getClass().toString().toUpperCase())) {
-            mSameFragment.setValue(true);
-        }
-
-        this.mSeletedFragment.setValue(seletedFragment);
-    }
-
-    public boolean ismFirstTime() {
-        return mFirstTime;
-    }
-
-    public void setmFirstTime(boolean mFirstTime) {
-        this.mFirstTime = mFirstTime;
-    }
 }

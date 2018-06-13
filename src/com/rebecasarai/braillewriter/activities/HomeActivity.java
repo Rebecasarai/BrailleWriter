@@ -12,7 +12,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
-import com.rebecasarai.braillewriter.MainViewModel;
+import com.rebecasarai.braillewriter.viewmodel.StateViewModel;
+import com.rebecasarai.braillewriter.viewmodel.SubscriptionsMainViewModel;
 import com.rebecasarai.braillewriter.fragments.ObjectRecognitionFragment;
 import com.rebecasarai.braillewriter.fragments.SubscribeFragment;
 
@@ -22,20 +23,18 @@ import com.rebecasarai.braillewriter.fragments.AboutFragment;
 import com.rebecasarai.braillewriter.fragments.BrailleTranslatorFragment;
 import com.rebecasarai.braillewriter.fragments.FacesFragment;
 import com.rebecasarai.braillewriter.fragments.ReadFragment;
-import com.rebecasarai.braillewriter.subscription.SubscriptionManager;
-import com.rebecasarai.braillewriter.subscription.SubscriptionManagerProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import timber.log.Timber;
 
-public class HomeActivity extends AppCompatActivity implements SubscriptionManagerProvider {
-    private SubscriptionManager subsV3Manager;
+public class HomeActivity extends AppCompatActivity {
     private Fragment mSelectedFragment;
     private boolean initialStatus;
     private boolean isSubscribed;
-     MainViewModel model;
+    private SubscriptionsMainViewModel msubsVM;
+    private StateViewModel mStateVM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +47,8 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
         }
 
 
-        model = ViewModelProviders.of(this).get(MainViewModel.class);
+        msubsVM = ViewModelProviders.of(this).get(SubscriptionsMainViewModel.class);
+        mStateVM = ViewModelProviders.of(this).get(StateViewModel.class);
 
 
         bottomNavigationView.setOnNavigationItemSelectedListener
@@ -69,7 +69,7 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                                 break;
 
                             case R.id.navigation_faces:
-                                if(model.checkSubscribedMonth()){
+                                if(msubsVM.checkSubscribedMonth()){
                                     mSelectedFragment = FacesFragment.getInstance();
                                 }else{
                                     mSelectedFragment = SubscribeFragment.getInstance();
@@ -81,13 +81,13 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                                 mSelectedFragment = AboutFragment.getInstance();
                                 break;
                         }
-                        model.setmSeletedFragment(mSelectedFragment);
+                        mStateVM.setmSeletedFragment(mSelectedFragment);
 
                         return true;
                     }
                 });
 
-        model.getmSeletedFragment().observe(this, new Observer<Fragment>() {
+        mStateVM.getmSeletedFragment().observe(this, new Observer<Fragment>() {
             @Override
             public void onChanged(@Nullable Fragment fragment) {
                 setFragment(fragment);
@@ -111,16 +111,10 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
 
     @Override
     protected void onDestroy() {
-
-        //subsV3Manager.doUnbindService();
         super.onDestroy();
 
     }
 
-    @Override
-    public SubscriptionManager getSubsV3Manager() {
-        return subsV3Manager;
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -136,7 +130,7 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                     Timber.e("You have bought the " + sku + ". Excellent choice, adventurer!");
 
 
-                    model.setIsRecentlySuscribed(true);
+                    msubsVM.setIsRecentlySuscribed(true);
 
                     //subsV3Manager.setRecentlySuscribed(true);
                     mSelectedFragment = getSupportFragmentManager().findFragmentByTag("currentFragment");
@@ -159,7 +153,7 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
     @Override
     protected void onResume() {
         super.onResume();
-        if(model.checkSubscribedMonth() != isSubscribed){
+        if(msubsVM.checkSubscribedMonth() != isSubscribed){
           setFragment(mSelectedFragment);
 
         }

@@ -20,10 +20,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.rebecasarai.braillewriter.MainViewModel;
+import com.rebecasarai.braillewriter.viewmodel.StateViewModel;
+import com.rebecasarai.braillewriter.viewmodel.SubscriptionsMainViewModel;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.subscription.Subscription;
-import com.rebecasarai.braillewriter.subscription.SubscriptionManagerProvider;
 
 import java.util.Locale;
 
@@ -45,7 +45,8 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
     private TextView title, description, price;
     private Button button;
     LinearLayout cuadro;
-    private MainViewModel model;
+    private SubscriptionsMainViewModel msubsVM;
+    private StateViewModel mStateVM;
 
     public AboutFragment() {
         // Required empty public constructor
@@ -65,13 +66,14 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
         View root = inflater.inflate(R.layout.fragment_about, container, false);
 
         findViews(root);
-        model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        msubsVM = ViewModelProviders.of(getActivity()).get(SubscriptionsMainViewModel.class);
+        mStateVM = ViewModelProviders.of(getActivity()).get(StateViewModel.class);
 
         setWaitScreen(true);
         checkSubscribed();
 
         toSpeak = "Ha entrado a configuración";
-        if(model.getmSameFragment().getValue()){
+        if(mStateVM.getmSameFragment().getValue()){
             toSpeak ="";
         }
 
@@ -87,7 +89,7 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
      * the string to speak is to let him/her know its successfully subscribed.
      */
     private void checkSubscribed(){
-        model.getIsSubscribed().observe(this, new Observer<Boolean>() {
+        msubsVM.getIsSubscribed().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
 
@@ -97,7 +99,7 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
                 showManageSubs();
 
             } else {
-                Subscription subsDetails = model.getMonthSubsDetails();
+                Subscription subsDetails = msubsVM.getMonthSubsDetails();
                 showSubDetails(subsDetails);
             }
 
@@ -110,9 +112,9 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
      * or unsubscribed during the time of being in the fragment.
      */
     private void checkRecentlySubscribed(){
-        if (model.getIsRecentlySuscribed().getValue()) {
+        if (msubsVM.getIsRecentlySuscribed().getValue()) {
             toSpeak = "Felicidades, se ha suscrito exitosamente.";
-            model.setIsRecentlySuscribed(false);
+            msubsVM.setIsRecentlySuscribed(false);
         }
     }
 
@@ -138,8 +140,7 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
                 break;
 
             case R.id.state_button_sub:
-                //Bundle buyIntentBundle= mSubscriptionProvider.getSubsV3Manager().buySubscription();
-                Bundle buyIntentBundle = model.buySubscription();
+                Bundle buyIntentBundle = msubsVM.buySubscription();
                 PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
                 try {
                     getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), 0, 0, 0);
@@ -150,8 +151,7 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
                 break;
 
             case R.id.cuadro:
-                //mSubscriptionProvider.getSubsV3Manager().buySubscription();
-                Bundle buyIntentBundle2 = model.buySubscription();
+                Bundle buyIntentBundle2 = msubsVM.buySubscription();
                 PendingIntent pendingIntent2 = buyIntentBundle2.getParcelable("BUY_INTENT");
                 try {
                     getActivity().startIntentSenderForResult(pendingIntent2.getIntentSender(), 1001, new Intent(), 0, 0, 0);

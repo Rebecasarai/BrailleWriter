@@ -17,7 +17,8 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.rebecasarai.braillewriter.MainViewModel;
+import com.rebecasarai.braillewriter.viewmodel.StateViewModel;
+import com.rebecasarai.braillewriter.viewmodel.SubscriptionsMainViewModel;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.ui.OCR.CameraSource;
 import com.rebecasarai.braillewriter.ui.OCR.CameraSourcePreview;
@@ -80,7 +81,7 @@ public class ReadFragment extends Fragment implements View.OnClickListener {
 
         View rootview = inflater.inflate(R.layout.fragment_read, container, false);
 
-        MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        StateViewModel model = ViewModelProviders.of(getActivity()).get(StateViewModel.class);
 
         mPreview = (CameraSourcePreview) rootview.findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay<OcrGraphic>) rootview.findViewById(R.id.graphicOverlay);

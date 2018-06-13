@@ -16,7 +16,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.rebecasarai.braillewriter.MainViewModel;
+import com.rebecasarai.braillewriter.viewmodel.StateViewModel;
+import com.rebecasarai.braillewriter.viewmodel.SubscriptionsMainViewModel;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.subscription.Subscription;
 
@@ -36,11 +37,11 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
     private TextToSpeech tts;
     private View mLoadingView;
     private TextView mErrorTextView;
-    //private SubscriptionManagerProvider mSubscriptionProvider;
 
-    public TextView title, description;
-    public Button button;
-    MainViewModel model;
+    private TextView title, description;
+    private Button button;
+    private StateViewModel mStateVM;
+    private SubscriptionsMainViewModel msubsVM;
 
     public static SubscribeFragment getInstance() {
         if (INSTANCE == null) {
@@ -61,24 +62,25 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
         findViews(root);
 
         setWaitScreen(true);
-        //onManageReadyBilling((SubscriptionManagerProvider) getActivity());
 
-        model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        mStateVM = ViewModelProviders.of(getActivity()).get(StateViewModel.class);
+        msubsVM = ViewModelProviders.of(getActivity()).get(SubscriptionsMainViewModel.class);
+
         toSpeak = "Ha entrado a configuración";
-        if(model.getmSameFragment().getValue() ){
+        if(mStateVM.getmSameFragment().getValue() ){
             toSpeak ="";
         }
 
-        model.getIsSubscribed().observe(this, new Observer<Boolean>() {
+        msubsVM.getIsSubscribed().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
 
                 toSpeak = "Prueba reconocer rostros y emociones gratis por 12 días";
-                if (model.getmSameFragment().getValue() != null && model.getmSameFragment().getValue()) {
+                if (mStateVM.getmSameFragment().getValue() != null && mStateVM.getmSameFragment().getValue()) {
                     toSpeak = "";
-                    model.getmSameFragment().setValue(false);
+                    mStateVM.getmSameFragment().setValue(false);
                 }
-                Subscription subsDetails = model.getMonthSubsDetails();
+                Subscription subsDetails = msubsVM.getMonthSubsDetails();
                 showSubDetails(subsDetails);
 
             }
@@ -97,17 +99,6 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
 
     }
 
-    /*public void onManageReadyBilling(SubscriptionManagerProvider billingProvider) {
-        mSubscriptionProvider = billingProvider;
-        toSpeak = "Prueba reconocer rostros y emociones gratis por 12 días";
-       if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
-            toSpeak="";
-            model.getmSameFragment().setValue(false);
-       }
-        Subscription subsDetails = mSubscriptionProvider.getSubsV3Manager().getMonthSubsDetails();
-        showSubDetails(subsDetails);
-
-    }*/
 
     public void showSubDetails(Subscription subsDetails) {
         button.setOnClickListener(this);
@@ -129,8 +120,7 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
         switch (v.getId()) {
 
             case R.id.state_button_sub_f:
-                //mSubscriptionProvider.getSubsV3Manager().buySubscription();
-                Bundle buyIntentBundle = model.buySubscription();
+                Bundle buyIntentBundle = msubsVM.buySubscription();
                 PendingIntent pendingIntent = buyIntentBundle.getParcelable("BUY_INTENT");
                 try {
                     getActivity().startIntentSenderForResult(pendingIntent.getIntentSender(), 1001, new Intent(), 0, 0, 0);
@@ -140,8 +130,7 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
                 break;
 
             case R.id.cuadro:
-                //mSubscriptionProvider.getSubsV3Manager().buySubscription();
-                Bundle buyIntentBundle2 = model.buySubscription();
+                Bundle buyIntentBundle2 = msubsVM.buySubscription();
                 PendingIntent pendingIntent2 = buyIntentBundle2.getParcelable("BUY_INTENT");
                 try {
                     getActivity().startIntentSenderForResult(pendingIntent2.getIntentSender(), 1001, new Intent(), 0, 0, 0);
@@ -171,6 +160,14 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
         }
     }
 
+
+    @Override
+    public void onStop() {
+        if (tts != null) {
+            tts.stop();
+        }
+        super.onStop();
+    }
 
     @Override
     public void onDestroy() {

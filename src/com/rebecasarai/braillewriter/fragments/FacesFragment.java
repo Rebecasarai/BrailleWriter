@@ -2,18 +2,14 @@ package com.rebecasarai.braillewriter.fragments;
 
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,9 +22,10 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
-import com.rebecasarai.braillewriter.MainViewModel;
+import com.rebecasarai.braillewriter.subscription.Subscription;
+import com.rebecasarai.braillewriter.viewmodel.StateViewModel;
+import com.rebecasarai.braillewriter.viewmodel.SubscriptionsMainViewModel;
 import com.rebecasarai.braillewriter.R;
-import com.rebecasarai.braillewriter.subscription.SubscriptionManagerProvider;
 import com.rebecasarai.braillewriter.ui.face.CameraSourcePreview;
 import com.rebecasarai.braillewriter.ui.face.FaceGraphic;
 import com.rebecasarai.braillewriter.ui.face.GraphicOverlay;
@@ -81,13 +78,14 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         findViews(rootview);
         toSpeak = "Ha entrado a Reconocimiento de rostros";
 
-        MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        if(model.getIsRecentlySuscribed().getValue()){
+        StateViewModel stateVM = ViewModelProviders.of(getActivity()).get(StateViewModel.class);
+        SubscriptionsMainViewModel subsVM = ViewModelProviders.of(getActivity()).get(SubscriptionsMainViewModel.class);
+        if(subsVM.getIsRecentlySuscribed().getValue()){
             toSpeak = "Felicidades, se ha suscrito exitosamente. Reconozca emociones";
-            model.setIsRecentlySuscribed(true);
+            subsVM.setIsRecentlySuscribed(true);
         }
 
-        if(model.getmSameFragment().getValue() ){
+        if(stateVM.getmSameFragment().getValue() ){
             toSpeak ="";
         }
         tts = new TextToSpeech(getContext(), this);

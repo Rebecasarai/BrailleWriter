@@ -16,7 +16,8 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.rebecasarai.braillewriter.MainViewModel;
+import com.rebecasarai.braillewriter.viewmodel.StateViewModel;
+import com.rebecasarai.braillewriter.viewmodel.SubscriptionsMainViewModel;
 import com.rebecasarai.braillewriter.R;
 import com.rebecasarai.braillewriter.braille.Convertor.FileManagerConvertor;
 
@@ -71,7 +72,7 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
         mConvertFileButton.setOnClickListener(this);
         TAG = root.getClass().getName();
 
-        MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        StateViewModel model = ViewModelProviders.of(getActivity()).get(StateViewModel.class);
         toSpeak = "Ha entrado a traductor a braille";
 
 
@@ -146,6 +147,13 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
         super.onDestroy();
     }
 
+    @Override
+    public void onStop() {
+        if (tts != null) {
+            tts.stop();
+        }
+        super.onStop();
+    }
 
     @Override
     public void onInit(int status) {
