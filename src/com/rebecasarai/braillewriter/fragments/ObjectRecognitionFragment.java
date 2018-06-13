@@ -287,13 +287,20 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
     @Override
     public synchronized void onResume() {
         Timber.d("onResume " + this);
-        super.onResume();
         handlerThread = new HandlerThread("inference");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
+
         mResultView = (ResultsView) getRootview().findViewById(R.id.results);
+
         mScreenOverlay = getRootview().findViewById(R.id.debug_overlay);
-        mScreenOverlay.setOnClickListener(this);
+        if(mScreenOverlay != null){
+            mScreenOverlay.setOnClickListener(this);
+
+        }
+        //
+         super.onResume();
+
     }
 
     @Override
@@ -675,4 +682,7 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
             }
         });
     }
+
+
+
 }
