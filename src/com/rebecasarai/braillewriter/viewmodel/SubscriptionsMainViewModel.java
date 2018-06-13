@@ -33,7 +33,7 @@ public class SubscriptionsMainViewModel extends AndroidViewModel {
     private boolean mIsBinded;
     private String tag;
     private MutableLiveData<ServiceConnection> mServiceConn = new MutableLiveData<>();
-    Application app;
+    private Application app;
     private IInAppBillingService mService;
     private Gson gson = new Gson();
     private MutableLiveData<Boolean> isRecentlySuscribed = new MutableLiveData<>();

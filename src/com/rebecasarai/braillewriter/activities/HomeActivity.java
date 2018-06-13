@@ -31,8 +31,6 @@ import timber.log.Timber;
 
 public class HomeActivity extends AppCompatActivity {
     private Fragment mSelectedFragment;
-    private boolean initialStatus;
-    private boolean isSubscribed;
     private SubscriptionsMainViewModel msubsVM;
     private StateViewModel mStateVM;
 
@@ -131,14 +129,12 @@ public class HomeActivity extends AppCompatActivity {
 
 
                     msubsVM.setIsRecentlySuscribed(true);
-
-                    //subsV3Manager.setRecentlySuscribed(true);
                     mSelectedFragment = getSupportFragmentManager().findFragmentByTag("currentFragment");
                     if(mSelectedFragment != null){
-                        //setFragment(mSelectedFragment);
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         transaction.replace(R.id.framelayout, mSelectedFragment, "currentFragment");
                         transaction.commitAllowingStateLoss();
+                        mStateVM.setmSeletedFragment(mSelectedFragment);
                     }
                 }
                 catch (JSONException e) {
@@ -153,10 +149,6 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(msubsVM.checkSubscribedMonth() != isSubscribed){
-          setFragment(mSelectedFragment);
-
-        }
     }
 
 
