@@ -44,10 +44,8 @@ public class HomeActivity extends AppCompatActivity {
             Timber.plant(new Timber.DebugTree());
         }
 
-
         msubsVM = ViewModelProviders.of(this).get(SubscriptionsMainViewModel.class);
         mStateVM = ViewModelProviders.of(this).get(StateViewModel.class);
-
 
         bottomNavigationView.setOnNavigationItemSelectedListener
                 (new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -95,8 +93,9 @@ public class HomeActivity extends AppCompatActivity {
 
 
     /**
-     * Sets the fragment selected to the Layout, so it shows it replaces the current one with the one passed as parameter
-     * @param selectedFragment REpresenting the selected Fragment by the interaction with the menu
+     * Sets the fragment selected to the Layout, so it shows it replaces the current one with the one
+     * passed as a parameter and it's setted a tag for it.
+     * @param selectedFragment Representing the selected Fragment by the interaction with the menu
      */
     private void setFragment(Fragment selectedFragment){
         if(selectedFragment!=null){
@@ -106,13 +105,11 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

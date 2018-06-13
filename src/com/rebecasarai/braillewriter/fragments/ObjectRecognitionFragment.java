@@ -73,8 +73,6 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
     private int[] rgbBytes = null;
     private int yRowStride;
     private byte[] lastPreviewFrame;
-
-
     protected int previewWidth = 0;
     protected int previewHeight = 0;
 
@@ -402,7 +400,7 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
             for (final String cameraId : manager.getCameraIdList()) {
                 final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
 
-                // We don't use a front facing camera in this sample.
+                // It's not going to use the front facing camera.
                 final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
@@ -454,7 +452,6 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
             fragment = camera2Fragment;
         } else {
             fragment =
-                    //new LegacyCameraConnectionFragment(this, getLayoutId(), getDesiredPreviewFrameSize());
                     new LegacyCameraConnectionFragment(this, getLayoutId(), getDesiredPreviewFrameSize(), 90 - getScreenOrientation());
         }
 
