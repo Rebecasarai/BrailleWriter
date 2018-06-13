@@ -20,6 +20,6 @@ import com.rebecasarai.braillewriter.classification.ObjectRecognition;
 import java.util.List;
 
 public interface ResultsView {
-  public void setResults(final List<ObjectRecognition> results);
+  void setResults(final List<ObjectRecognition> results);
 
 }

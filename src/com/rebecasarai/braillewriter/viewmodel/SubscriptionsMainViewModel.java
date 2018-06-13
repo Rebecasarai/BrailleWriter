@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import timber.log.Timber;
 
+
 public class SubscriptionsMainViewModel extends AndroidViewModel {
     private Repository mRepository;
     private boolean mIsBinded;
@@ -45,7 +46,6 @@ public class SubscriptionsMainViewModel extends AndroidViewModel {
         super(application);
         createService();
         app = application;
-        //context = application.getApplicationContext();
         tag = "In App Billing";
         isRecentlySuscribed.setValue(false);
 
@@ -55,15 +55,6 @@ public class SubscriptionsMainViewModel extends AndroidViewModel {
 
         isSubscribed.setValue(checkSubscribedMonth());
         Timber.i("bindService - return " + String.valueOf(mIsBinded));
-    }
-
-
-    public MutableLiveData<Boolean> getIsSubscribed() {
-        if (isSubscribed == null) {
-            isSubscribed.setValue(false);
-        }
-        isSubscribed.setValue(checkSubscribedMonth());
-        return isSubscribed;
     }
 
 
@@ -236,6 +227,19 @@ public class SubscriptionsMainViewModel extends AndroidViewModel {
     }
 
 
+
+    public MutableLiveData<Boolean> getIsSubscribed() {
+        if (isSubscribed == null) {
+            isSubscribed.setValue(false);
+        }
+        isSubscribed.setValue(checkSubscribedMonth());
+        return isSubscribed;
+    }
+
+    /**
+     * Checks if is recently subscribed, so it can says it next tie it gets to a fragment.
+     * @return
+     */
     public MutableLiveData<Boolean> getIsRecentlySuscribed() {
         if (isRecentlySuscribed == null) {
             isRecentlySuscribed.setValue(false);

@@ -102,9 +102,6 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
 
     private Bitmap rgbFrameBitmap = null;
     private Bitmap croppedBitmap = null;
-    private Bitmap cropCopyBitmap = null;
-
-    private long lastProcessingTimeMs;
 
     private static final int INPUT_SIZE = 224;
     private static final int IMAGE_MEAN = 117;
@@ -155,7 +152,7 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        rootview = inflater.inflate(R.layout.fragment_camera, container, false);
+        rootview = inflater.inflate(R.layout.fragment_object_recognition, container, false);
 
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -537,9 +534,7 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
                         final long startTime = SystemClock.uptimeMillis();
                         final List<ObjectRecognition> results = classifier.recognizeImage(croppedBitmap);
                         mResultsAudio = results;
-                        lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
                         Timber.v("Detect: %s", results);
-                        cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
                         mResultView.setResults(results);
                         requestRender();
                         readyForNextImage();
@@ -583,13 +578,7 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
         Matrix cropToFrameTransform = new Matrix();
         frameToCropTransform.invert(cropToFrameTransform);
 
-        addCallback(
-                new OverlayView.DrawCallback() {
-                    @Override
-                    public void drawCallback(final Canvas canvas) {
-                        renderDebug(canvas);
-                    }
-                });
+
 
         mScreenOverlay = getRootview().findViewById(R.id.debug_overlay);
 
@@ -598,39 +587,6 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
 
     }
 
-
-    private void renderDebug(final Canvas canvas) {
-        if (!isDebug()) {
-            return;
-        }
-        final Bitmap copy = cropCopyBitmap;
-        if (copy != null) {
-            final Matrix matrix = new Matrix();
-            final float scaleFactor = 2;
-            matrix.postScale(scaleFactor, scaleFactor);
-            matrix.postTranslate(
-                    canvas.getWidth() - copy.getWidth() * scaleFactor,
-                    canvas.getHeight() - copy.getHeight() * scaleFactor);
-            canvas.drawBitmap(copy, matrix, new Paint());
-
-            final Vector<String> lines = new Vector<String>();
-            if (classifier != null) {
-                String statString = classifier.getStatString();
-                String[] statLines = statString.split("\n");
-                for (String line : statLines) {
-                    lines.add(line);
-                }
-            }
-
-            lines.add("Frame: " + previewWidth + "x" + previewHeight);
-            lines.add("Crop: " + copy.getWidth() + "x" + copy.getHeight());
-            lines.add("View: " + canvas.getWidth() + "x" + canvas.getHeight());
-            lines.add("Rotation: " + sensorOrientation);
-            lines.add("Inference time: " + lastProcessingTimeMs + "ms");
-
-            //borderedText.drawLines(canvas, 10, canvas.getHeight() - 10, lines);
-        }
-    }
 
     public static ObjectRecognitionFragment getInstance() {
         if(INSTANCE == null){

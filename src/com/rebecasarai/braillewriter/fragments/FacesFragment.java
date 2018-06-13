@@ -22,7 +22,6 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
-import com.rebecasarai.braillewriter.subscription.Subscription;
 import com.rebecasarai.braillewriter.viewmodel.StateViewModel;
 import com.rebecasarai.braillewriter.viewmodel.SubscriptionsMainViewModel;
 import com.rebecasarai.braillewriter.R;
@@ -288,13 +287,11 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
             }if(mFaceHappiness< 0.1) {
 
                 toSpeak = "Esta muy serio. Tal vez enojado.";
-
                 Log.v("llego a ", "muy muy serio");
             }
 
+            tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
         }
-
-        tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
 
     }
 
@@ -344,7 +341,7 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
             mFaceGraphic = new FaceGraphic(overlay);
-
+            mFaceDetected = false;
         }
 
         /**
@@ -368,12 +365,6 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
             mFaceHappiness = face.getIsSmilingProbability();
             Log.v("Sonrie desde Update: ", ""+mFaceHappiness);
 
-            /*mLeftEyeOpen = face.getIsLeftEyeOpenProbability();
-            mRightEyeOpen = face.getIsRightEyeOpenProbability();
-
-            Log.v("Ojo cerrado izq", ""+mLeftEyeOpen);
-            Log.v("Ojo cerrado der", ""+mRightEyeOpen);
-            Log.v("Face: ", face.toString());*/
         }
 
         /**
@@ -384,6 +375,7 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         @Override
         public void onMissing(FaceDetector.Detections<Face> detectionResults) {
             mOverlay.remove(mFaceGraphic);
+            mFaceDetected = false;
         }
 
         /**
