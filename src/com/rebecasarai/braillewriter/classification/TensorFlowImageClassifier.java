@@ -32,7 +32,7 @@ import org.tensorflow.contrib.android.TensorFlowInferenceInterface;
 
 import timber.log.Timber;
 
-/** A classifier specialized to label images using TensorFlow. */
+/** A classifier specialized to label images using TensorFlow Mobile. */
 public class TensorFlowImageClassifier implements Classifier {
   private static final String TAG = "TensorFlowImageClassifier";
 

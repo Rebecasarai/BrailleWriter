@@ -46,7 +46,8 @@ public class RecognitionScoreView extends View implements ResultsView {
 
     bgPaint = new Paint();
     bgPaint.setAlpha(50);
-    bgPaint.setColor(Color.WHITE);
+    bgPaint.setColor(0x58ffffff);
+
   }
 
   @Override

@@ -31,7 +31,7 @@ import timber.log.Timber;
 
 
 /**
- * A {@link Fragment} subclass. That sets the About and subscription part of the app.
+ * The Settings and more about Fragment, where the user can subscribe and know more about privacy policy.
  */
 public class AboutFragment extends Fragment implements View.OnClickListener, TextToSpeech.OnInitListener {
 
@@ -42,11 +42,9 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
     private TextToSpeech tts;
     private View mLoadingView;
     private TextView mErrorTextView;
-    //private SubscriptionManagerProvider mSubscriptionProvider;
     private TextView title, description, price;
     private Button button;
     LinearLayout cuadro;
-
     private MainViewModel model;
 
     public AboutFragment() {
@@ -69,41 +67,54 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
         findViews(root);
         model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
 
-
         setWaitScreen(true);
+        checkSubscribed();
 
         toSpeak = "Ha entrado a configuración";
-
         if(model.getmSameFragment().getValue()){
             toSpeak ="";
         }
-        model.getIsSubscribed().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-
-                if (aBoolean) {
-
-                    if (model.getIsRecentlySuscribed().getValue()) {
-                        toSpeak = "Felicidades, se ha suscrito exitosamente.";
-                        model.setIsRecentlySuscribed(false);
-                    }
-                    showManageSubs();
-
-                } else {
-                    Subscription subsDetails = model.getMonthSubsDetails();
-                    showSubDetails(subsDetails);
-                }
-
-            }
-        });
-
-        //onManageReadyBilling((SubscriptionManagerProvider) getActivity());
 
         tts = new TextToSpeech(getContext(), this);
 
         return root;
     }
 
+
+    /**
+     * Determines with the SubscriptionManager whereas the user its subscribed or not.
+     * If its recently subscribed, meaning its the first fragment its getting into after subscribing,
+     * the string to speak is to let him/her know its successfully subscribed.
+     */
+    private void checkSubscribed(){
+        model.getIsSubscribed().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean aBoolean) {
+
+            if (aBoolean) {
+
+                checkRecentlySubscribed();
+                showManageSubs();
+
+            } else {
+                Subscription subsDetails = model.getMonthSubsDetails();
+                showSubDetails(subsDetails);
+            }
+
+            }
+        });
+    }
+
+    /**
+     * Checks if it has been a change in the currtent state of the user, meaning, if it has subscribed
+     * or unsubscribed during the time of being in the fragment.
+     */
+    private void checkRecentlySubscribed(){
+        if (model.getIsRecentlySuscribed().getValue()) {
+            toSpeak = "Felicidades, se ha suscrito exitosamente.";
+            model.setIsRecentlySuscribed(false);
+        }
+    }
 
     @Override
     public void onStart() {
@@ -114,38 +125,6 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
     @Override
     public void onResume() {
         super.onResume();
-        //checkIfChangedStatus();
-
-        /*
-
-        if(mSubscriptionProvider.getSubsV3Manager().checkSubscribedMonth()){
-            if(mSubscriptionProvider.getSubsV3Manager().isRecentlySuscribed()){
-                toSpeak = "Felicidades, se ha suscrito exitosamente.";
-                mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
-            }
-            showManageSubs();
-
-        }else{
-            Subscription subsDetails = mSubscriptionProvider.getSubsV3Manager().getMonthSubsDetails();
-            showSubDetails(subsDetails);
-        }*/
-
-    }
-
-    /**
-     * Checks if it has been a change in the currtent state of the user, meaning, if it has subscribed
-     * or unsubscribed during the time of being in the fragment.
-     */
-    private void checkIfChangedStatus() {
-        /*if(mSubscriptionProvider.getSubsV3Manager().checkSubscribedMonth()){
-            displayAccordingly();
-        }*/
-
-
-        if (model.checkSubscribedMonth()) {
-            displayAccordingly();
-        }
-
 
     }
 
@@ -233,49 +212,6 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
         button = (Button) root.findViewById(R.id.state_button_sub);
     }
 
-    /**
-     * Sets the Subscriptions Manager Interface and sets the String to speak to
-     * the regular one to guide the user.
-     *
-     * @param billingProvider
-     */
-    public void onManageReadyBilling(SubscriptionManagerProvider billingProvider) {
-        //mSubscriptionProvider = billingProvider;
-        toSpeak = "Ha entrado a configuración";
-        displayAccordingly();
-    }
-
-    /**
-     * Determines with the SubscriptionManager whereas the user its subscribed or not.
-     * If its recently subscribed, meaning its the first fragment its getting into after subscribing,
-     * the string to speak is to let him/her know its successfully subscribed.
-     */
-    private void displayAccordingly() {
-        /*if(mSubscriptionProvider.getSubsV3Manager().checkSubscribedMonth()){
-            if(mSubscriptionProvider.getSubsV3Manager().isRecentlySuscribed()){
-                toSpeak = "Felicidades, se ha suscrito exitosamente.";
-                mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
-            }
-            showManageSubs();
-
-        }else{
-            Subscription subsDetails = mSubscriptionProvider.getSubsV3Manager().getMonthSubsDetails();
-            showSubDetails(subsDetails);
-        }*/
-
-
-        if (model.checkSubscribedMonth()) {
-            if (model.getIsRecentlySuscribed().getValue()) {
-                toSpeak = "Felicidades, se ha suscrito exitosamente.";
-                model.setIsRecentlySuscribed(false);
-            }
-            showManageSubs();
-
-        } else {
-            Subscription subsDetails = model.getMonthSubsDetails();
-            showSubDetails(subsDetails);
-        }
-    }
 
     /**
      * Shows the active and possible subscription details

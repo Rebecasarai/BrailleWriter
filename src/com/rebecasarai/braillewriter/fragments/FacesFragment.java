@@ -45,25 +45,21 @@ import timber.log.Timber;
 public class FacesFragment extends Fragment implements View.OnClickListener,TextToSpeech.OnInitListener {
 
     private static final String TAG = "FaceTracker";
-
     private CameraSource mCameraSource = null;
-
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
 
     // Instance
     private static FacesFragment INSTANCE = new FacesFragment();
-
     private static final int GMS_CODE = 9001;
-    // permission request codes need to be < 256
-    private static final int CAMERA_PERM_CODE = 2;
+    private static final int RC_HANDLE_CAMERA_PERM = 2;
+
     private float mFaceHappiness;
     private Face mFace;
     private boolean mFaceDetected;
 
     private TextToSpeech tts;
     private String toSpeak ;
-    private SubscriptionManagerProvider mSubscriptionProvider;
 
 
     public FacesFragment() {
@@ -84,20 +80,10 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         mFaceDetected = false;
         findViews(rootview);
         toSpeak = "Ha entrado a Reconocimiento de rostros";
-/*
-        mSubscriptionProvider = (SubscriptionManagerProvider) getActivity();
-        if(mSubscriptionProvider.getSubsV3Manager().isRecentlySuscribed()){
-            toSpeak = "Felicidades, se ha suscrito exitosamente. Reconozca emociones";
-            mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
-        }*/
-
-
 
         MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        //model.getIsRecentlySuscribed().observe();
         if(model.getIsRecentlySuscribed().getValue()){
             toSpeak = "Felicidades, se ha suscrito exitosamente. Reconozca emociones";
-//            mSubscriptionProvider.getSubsV3Manager().setRecentlySuscribed(false);
             model.setIsRecentlySuscribed(true);
         }
 
@@ -119,7 +105,10 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         return rootview;
     }
 
-
+    /**
+     * Finds the views for the layout
+     * @param rootview
+     */
     private void findViews(View rootview){
         mPreview = (CameraSourcePreview) rootview.findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) rootview.findViewById(R.id.faceOverlay);
@@ -132,30 +121,60 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
      * sending the request.
      */
     private void requestCameraPermission() {
-        Timber.w( "Camera permission is not granted. Requesting permission");
+        // Check for the camera permission before accessing the camera.  If the
+        // permission is not granted yet, request permission.
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            startCameraSource();
+        } else {
+            final String[] permissions = new String[]{Manifest.permission.CAMERA};
+            ActivityCompat.requestPermissions(getActivity(), permissions, RC_HANDLE_CAMERA_PERM);
+        }
+    }
 
-        final String[] permissions = new String[]{Manifest.permission.CAMERA};
 
-        if (!ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
-                Manifest.permission.CAMERA)) {
-            ActivityCompat.requestPermissions(getActivity(), permissions, CAMERA_PERM_CODE);
+    /**
+     * Callback for the result from requesting permissions. This method
+     * is invoked for every call on {@link #requestPermissions(String[], int)}.
+     * <p>
+     * <strong>Note:</strong> It is possible that the permissions request interaction
+     * with the user is interrupted. In this case you will receive empty permissions
+     * and results arrays which should be treated as a cancellation.
+     * </p>
+     *
+     * @param requestCode  The request code passed in {@link #requestPermissions(String[], int)}.
+     * @param permissions  The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *                     which is either {@link PackageManager#PERMISSION_GRANTED}
+     *                     or {@link PackageManager#PERMISSION_DENIED}. Never null.
+     * @see #requestPermissions(String[], int)
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode != RC_HANDLE_CAMERA_PERM) {
+            Timber.d("Got unexpected permission result: " + requestCode);
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             return;
         }
 
-        final FragmentActivity thisActivity = getActivity();
-        View.OnClickListener listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ActivityCompat.requestPermissions(thisActivity, permissions,
-                        CAMERA_PERM_CODE);
-            }
-        };
+        if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Timber.d("Camera permission granted - initialize the camera source");
+            // we have permission, so create the camerasource
+            startCameraSource();
+            return;
+        }
+
+        Timber.e("Permission not granted: results len = " + grantResults.length +
+                " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
+
+        requestCameraPermission();
+
+
     }
 
+
+
     /**
-     * Creates and starts the camera.  Note that this uses a higher resolution in comparison
-     * to other detection examples to enable the barcode detector to detect small barcodes
-     * at long distances.
+     * Creates and starts the camera.  Note that this uses a higher resolution
      */
     private void createCameraSource() {
         Context context = getContext();
@@ -223,54 +242,6 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
 
         super.onDestroy();
     }
-
-    /**
-     * Callback for the result from requesting permissions. This method
-     * is invoked for every call on {@link #requestPermissions(String[], int)}.
-     * <p>
-     * <strong>Note:</strong> It is possible that the permissions request interaction
-     * with the user is interrupted. In this case you will receive empty permissions
-     * and results arrays which should be treated as a cancellation.
-     * </p>
-     *
-     * @param requestCode  The request code passed in {@link #requestPermissions(String[], int)}.
-     * @param permissions  The requested permissions. Never null.
-     * @param grantResults The grant results for the corresponding permissions
-     *                     which is either {@link PackageManager#PERMISSION_GRANTED}
-     *                     or {@link PackageManager#PERMISSION_DENIED}. Never null.
-     * @see #requestPermissions(String[], int)
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode != CAMERA_PERM_CODE) {
-            Timber.d( "Got unexpected permission result: " + requestCode);
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-            return;
-        }
-
-        if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Timber.d( "Camera permission granted - initialize the camera source");
-            // we have permission, so create the camerasource
-            createCameraSource();
-            return;
-        }
-
-        Timber.e( "Permission not granted: results len = " + grantResults.length +
-                " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
-
-        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                //finish();
-            }
-        };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Face Tracker sample")
-                .setMessage(R.string.no_camera_permission)
-                .setPositiveButton(R.string.ok, listener)
-                .show();
-    }
-
 
 
     /**

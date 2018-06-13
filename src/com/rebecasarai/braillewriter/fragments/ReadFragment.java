@@ -234,20 +234,6 @@ public class ReadFragment extends Fragment implements View.OnClickListener {
 
         requestCameraPermission();
 
-
-        /*DialogInterface.OnClickListener okayListener = new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                requestCameraPermission();
-            }
-        };
-
-        // TODO: add appropiate messages.
-        // This will show if permission is not granted
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Permisos")
-                .setMessage(R.string.no_camera_permission)
-                .setPositiveButton(R.string.ok, okayListener)
-                .show();*/
     }
 
     /**

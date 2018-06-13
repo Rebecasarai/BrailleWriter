@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import com.rebecasarai.braillewriter.MainViewModel;
+import com.rebecasarai.braillewriter.fragments.ObjectRecognitionFragment;
 import com.rebecasarai.braillewriter.fragments.SubscribeFragment;
 
 import com.rebecasarai.braillewriter.BuildConfig;
@@ -21,7 +22,6 @@ import com.rebecasarai.braillewriter.fragments.AboutFragment;
 import com.rebecasarai.braillewriter.fragments.BrailleTranslatorFragment;
 import com.rebecasarai.braillewriter.fragments.FacesFragment;
 import com.rebecasarai.braillewriter.fragments.ReadFragment;
-import com.rebecasarai.braillewriter.fragments.ObjectRecognitionFragment;
 import com.rebecasarai.braillewriter.subscription.SubscriptionManager;
 import com.rebecasarai.braillewriter.subscription.SubscriptionManagerProvider;
 
@@ -41,8 +41,7 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        BottomNavigationView bottomNavigationView = (BottomNavigationView)
-                findViewById(R.id.navigation);
+        BottomNavigationView bottomNavigationView = (BottomNavigationView) findViewById(R.id.navigation);
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
@@ -94,12 +93,13 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                 setFragment(fragment);
             }
         });
-
-
-
     }
 
 
+    /**
+     * Sets the fragment selected to the Layout, so it shows it replaces the current one with the one passed as parameter
+     * @param selectedFragment REpresenting the selected Fragment by the interaction with the menu
+     */
     private void setFragment(Fragment selectedFragment){
         if(selectedFragment!=null){
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -159,10 +159,6 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
     @Override
     protected void onResume() {
         super.onResume();
-        //if(subsV3Manager.checkSubscribedMonth() != initialStatus){
-          //  setFragment(mSelectedFragment);
-        //}
-
         if(model.checkSubscribedMonth() != isSubscribed){
           setFragment(mSelectedFragment);
 
