@@ -74,9 +74,10 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
         MainViewModel model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         toSpeak = "Ha entrado a traductor a braille";
 
-        if (model.getmSameFragment().getValue() != null && model.getmSameFragment().getValue()) {
-            toSpeak = "";
-            model.getmSameFragment().setValue(false);
+
+
+        if(model.getmSameFragment().getValue()){
+            toSpeak ="";
         }
 
         tts = new TextToSpeech(getContext(), this);

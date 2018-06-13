@@ -67,12 +67,16 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
         View root = inflater.inflate(R.layout.fragment_about, container, false);
 
         findViews(root);
+        model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
 
 
         setWaitScreen(true);
 
         toSpeak = "Ha entrado a configuración";
-        model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+
+        if(model.getmSameFragment().getValue()){
+            toSpeak ="";
+        }
         model.getIsSubscribed().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {

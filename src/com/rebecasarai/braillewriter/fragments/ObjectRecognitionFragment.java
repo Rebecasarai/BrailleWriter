@@ -60,22 +60,6 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
 
     private long lastProcessingTimeMs;
 
-    // These are the settings for the original v1 Inception model. If you want to
-    // use a model that's been produced from the TensorFlow for Poets codelab,
-    // you'll need to set IMAGE_SIZE = 299, IMAGE_MEAN = 128, IMAGE_STD = 128,
-    // INPUT_NAME = "Mul", and OUTPUT_NAME = "final_result".
-    // You'll also need to update the MODEL_FILE and LABEL_FILE paths to point to
-    // the ones you produced.
-    //
-    // To use v3 Inception model, strip the DecodeJpeg Op from your retrained
-    // model first:
-    //
-    // python strip_unused.py \
-    // --input_graph=<retrained-pb-file> \
-    // --output_graph=<your-stripped-pb-file> \
-    // --input_node_names="Mul" \
-    // --output_node_names="final_result" \
-    // --input_binary=true
     private static final int INPUT_SIZE = 224;
     private static final int IMAGE_MEAN = 117;
     private static final float IMAGE_STD = 1;
@@ -112,6 +96,7 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
     public void onPreviewSizeChosen(final Size size, final int rotation) {
 
         toSpeak = "Ha entrado a reconocer";
+
 
         tts = new TextToSpeech(getContext(), this);
 

@@ -88,17 +88,17 @@ public class ReadFragment extends Fragment implements View.OnClickListener {
         ocr = new OCRManager(getContext(), mGraphicOverlay);
 
         toSpeak = "Ha entrado en leer";
+        if(model.getmSameFragment().getValue()){
+            toSpeak ="";
+        }
 
         model.getmSameFragment().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {
-                Timber.e("ENTRO SAME FRAGMENT");
-            }
-        });
-        model.getmSeletedFragment().observe(this, new Observer<Fragment>() {
-            @Override
-            public void onChanged(@Nullable Fragment fragment) {
-                Timber.e("ENTRO Selected fragment");
+                if(aBoolean){
+
+                    toSpeak ="";
+                }
             }
         });
 
@@ -166,6 +166,10 @@ public class ReadFragment extends Fragment implements View.OnClickListener {
         if (tts != null) {
             tts.stop();
             tts.shutdown();
+        }
+        if (tts2 != null) {
+            tts2.stop();
+            tts2.shutdown();
         }
 
         if (mPreview != null) {

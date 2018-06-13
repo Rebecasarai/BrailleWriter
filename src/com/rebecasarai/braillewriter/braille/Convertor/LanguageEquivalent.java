@@ -6,6 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class that creates a vocabulary of equivalent Braille Language to either English or spanish
+ */
 public class LanguageEquivalent {
 
     private Map<String,String> mAlphabet;

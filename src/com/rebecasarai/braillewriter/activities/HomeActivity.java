@@ -48,29 +48,9 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
             Timber.plant(new Timber.DebugTree());
         }
 
-        //subsV3Manager = new SubscriptionManager(this,getApplication());
-        if(savedInstanceState == null){
-            //subsV3Manager.createService();
-        }
-
-        //subsV3Manager.createService();
-        //initialStatus = subsV3Manager.checkSubscribedMonth();
-
 
         model = ViewModelProviders.of(this).get(MainViewModel.class);
 
-        if(model.getIsSubscribed().getValue()){
-            isSubscribed = true;
-        }
-
-        model.getIsSubscribed().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                if(aBoolean != null){
-                    isSubscribed = aBoolean;
-                }
-            }
-        });
 
         bottomNavigationView.setOnNavigationItemSelectedListener
                 (new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -90,20 +70,11 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                                 break;
 
                             case R.id.navigation_faces:
-                                //if(subsV3Manager.checkSubscribedMonth()){
-                                //if(model.checkSubscribedMonth()){
                                 if(model.checkSubscribedMonth()){
                                     mSelectedFragment = FacesFragment.getInstance();
                                 }else{
                                     mSelectedFragment = SubscribeFragment.getInstance();
                                 }
-
-                                //}else{
-
-                                //}
-
-                                //}else{
-                                //}
 
                                 break;
 
@@ -112,32 +83,15 @@ public class HomeActivity extends AppCompatActivity implements SubscriptionManag
                                 break;
                         }
                         model.setmSeletedFragment(mSelectedFragment);
-                        //setFragment(mSelectedFragment);
 
                         return true;
                     }
                 });
 
-
-        /*if(mSelectedFragment == null){
-            model.setmSeletedFragment(ReadFragment.newInstance());
-        }*/
-
         model.getmSeletedFragment().observe(this, new Observer<Fragment>() {
             @Override
             public void onChanged(@Nullable Fragment fragment) {
-                //mSelectedFragment = fragment;
-                //Timber.e("ENTRO Selected fragment");
-
                 setFragment(fragment);
-            }
-        });
-
-
-        model.getmSameFragment().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                Timber.e("ENTRO SAME FRAGMENT");
             }
         });
 

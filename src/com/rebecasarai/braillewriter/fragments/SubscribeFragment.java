@@ -65,6 +65,10 @@ public class SubscribeFragment extends Fragment implements View.OnClickListener,
 
         model = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         toSpeak = "Ha entrado a configuración";
+        if(model.getmSameFragment().getValue() ){
+            toSpeak ="";
+        }
+
         model.getIsSubscribed().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(@Nullable Boolean aBoolean) {

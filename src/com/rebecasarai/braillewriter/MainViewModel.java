@@ -13,6 +13,7 @@ import android.os.RemoteException;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.text.BoringLayout;
 import android.widget.Toast;
 
 import com.android.vending.billing.IInAppBillingService;
@@ -34,6 +35,7 @@ public class MainViewModel extends AndroidViewModel {
     private MutableLiveData<Subscription> mSubscription = new MutableLiveData<>();
     private MutableLiveData<Boolean> mSameFragment = new MutableLiveData<>();
     private MutableLiveData<ServiceConnection> mServiceConn = new MutableLiveData<>();
+    private boolean mFirstTime = true;
 
 
     private boolean mIsBinded;
@@ -61,6 +63,8 @@ public class MainViewModel extends AndroidViewModel {
 
         isSubscribed.setValue(checkSubscribedMonth());
         mSeletedFragment.setValue(ReadFragment.getInstance());
+        mSameFragment.setValue(false);
+        mFirstTime = true;
         Timber.i("bindService - return " + String.valueOf(mIsBinded));
     }
 
@@ -255,10 +259,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
 
-    public MutableLiveData<Boolean> getmSameFragment() {
-        if (mSameFragment == null) {
-            mSameFragment.setValue(false);
-        }
+    public MutableLiveData<Boolean>getmSameFragment() {
         return mSameFragment;
     }
 
@@ -276,14 +277,21 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void setmSeletedFragment(Fragment seletedFragment) {
+        mFirstTime = false;
         mSameFragment.setValue(false);
 
-        if (mSeletedFragment.getValue() == seletedFragment) {
+        if (mSeletedFragment.getValue().getClass().toString().toUpperCase().equals(seletedFragment.getClass().toString().toUpperCase())) {
             mSameFragment.setValue(true);
         }
 
         this.mSeletedFragment.setValue(seletedFragment);
     }
 
+    public boolean ismFirstTime() {
+        return mFirstTime;
+    }
 
+    public void setmFirstTime(boolean mFirstTime) {
+        this.mFirstTime = mFirstTime;
+    }
 }

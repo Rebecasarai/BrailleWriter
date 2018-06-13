@@ -40,7 +40,7 @@ import timber.log.Timber;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment where the Face Detection is handleled.
  */
 public class FacesFragment extends Fragment implements View.OnClickListener,TextToSpeech.OnInitListener {
 
@@ -101,9 +101,8 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
             model.setIsRecentlySuscribed(true);
         }
 
-        if( model.getmSameFragment().getValue()!= null && model.getmSameFragment().getValue()){
-            toSpeak="";
-            model.getmSameFragment().setValue(false);
+        if(model.getmSameFragment().getValue() ){
+            toSpeak ="";
         }
         tts = new TextToSpeech(getContext(), this);
 
@@ -151,11 +150,6 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
                         CAMERA_PERM_CODE);
             }
         };
-
-        Snackbar.make(mGraphicOverlay, R.string.permission_camera_rationale,
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.ok, listener)
-                .show();
     }
 
     /**
