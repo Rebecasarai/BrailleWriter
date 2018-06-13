@@ -50,7 +50,9 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
     private String toSpeak;
     protected static final boolean SAVE_PREVIEW_BITMAP = false;
 
-    private ResultsView resultsView;
+    private ResultsView mResultView;
+    private OverlayView mScreenOverlay;
+
 
     private Bitmap rgbFrameBitmap = null;
     private Bitmap croppedBitmap = null;
@@ -154,10 +156,10 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
                     }
                 });
 
-        OverlayView screen_overlay = getRootview().findViewById(R.id.debug_overlay);
+        mScreenOverlay = getRootview().findViewById(R.id.debug_overlay);
 
 
-        screen_overlay.setOnClickListener(this);
+        mScreenOverlay.setOnClickListener(this);
 
     }
 
@@ -190,7 +192,7 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
                         lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
                         Timber.v("Detect: %s", results);
                         cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
-                        resultsView.setResults(results);
+                        mResultView.setResults(results);
                         requestRender();
                         readyForNextImage();
                     }
@@ -318,7 +320,9 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
     @Override
     public synchronized void onResume(){
         super.onResume();
-        resultsView = (ResultsView) getRootview().findViewById(R.id.results);
+        mResultView = (ResultsView) getRootview().findViewById(R.id.results);
+        mScreenOverlay = getRootview().findViewById(R.id.debug_overlay);
+        mScreenOverlay.setOnClickListener(this);
     }
 
     @Override
@@ -328,10 +332,6 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
             tts.stop();
             tts.shutdown();
         }
-
-        // TODO: solves problem, but this is a bad fix, it should turn to null by itself when view rotates
-        //resultsView = null;
-
         super.onDestroy();
     }
 }
