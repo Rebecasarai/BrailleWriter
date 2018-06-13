@@ -26,22 +26,19 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.rebecasarai.braillewriter.R;
-import com.rebecasarai.braillewriter.utils.ImageUtils;
 import com.rebecasarai.braillewriter.ui.objectRecognition.OverlayView;
+import com.rebecasarai.braillewriter.utils.ImageUtils;
 
 import java.nio.ByteBuffer;
 
 import timber.log.Timber;
 
-
 /**
  * A simple {@link Fragment} subclass.
  */
-public abstract class CameraFragment extends Fragment
-        implements ImageReader.OnImageAvailableListener, Camera.PreviewCallback {
+public abstract class CameraFragment extends Fragment implements ImageReader.OnImageAvailableListener, Camera.PreviewCallback {
 
     private static final int PERMISSIONS_REQUEST = 1;
-
     private static final String PERMISSION_CAMERA = Manifest.permission.CAMERA;
     private static final String PERMISSION_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -54,6 +51,8 @@ public abstract class CameraFragment extends Fragment
     private byte[][] yuvBytes = new byte[3][];
     private int[] rgbBytes = null;
     private int yRowStride;
+    private byte[] lastPreviewFrame;
+
 
     protected int previewWidth = 0;
     protected int previewHeight = 0;
@@ -75,25 +74,6 @@ public abstract class CameraFragment extends Fragment
         this.rootview = rootview;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        rootview =  inflater.inflate(R.layout.fragment_camera, container, false);
-
-        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        if (hasPermission()) {
-            setFragment();
-        } else {
-            requestPermission();
-        }
-        return rootview;
-
-    }
-
-    private byte[] lastPreviewFrame;
-
     protected int[] getRgbBytes() {
         imageConverter.run();
         return rgbBytes;
@@ -105,6 +85,23 @@ public abstract class CameraFragment extends Fragment
 
     protected byte[] getLuminance() {
         return yuvBytes[0];
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        rootview = inflater.inflate(R.layout.fragment_camera, container, false);
+
+        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        if (hasPermission()) {
+            setFragment();
+        } else {
+            requestPermission();
+        }
+        return rootview;
+
     }
 
     /**
@@ -154,7 +151,6 @@ public abstract class CameraFragment extends Fragment
                 };
         processImage();
     }
-
     /**
      * Callback for Camera2 API
      */
@@ -231,7 +227,6 @@ public abstract class CameraFragment extends Fragment
     public synchronized void onResume() {
         Timber.d("onResume " + this);
         super.onResume();
-
         handlerThread = new HandlerThread("inference");
         handlerThread.start();
         handler = new Handler(handlerThread.getLooper());
@@ -243,7 +238,7 @@ public abstract class CameraFragment extends Fragment
 
         if (!isRemoving()) {
             Timber.d("Requesting finish");
-           // finish();
+            // finish();
         }
 
         handlerThread.quitSafely();
@@ -276,20 +271,6 @@ public abstract class CameraFragment extends Fragment
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(
-            final int requestCode, final String[] permissions, final int[] grantResults) {
-        if (requestCode == PERMISSIONS_REQUEST) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                setFragment();
-            } else {
-                requestPermission();
-            }
-        }
-    }
-
     private boolean hasPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return getActivity().checkSelfPermission(PERMISSION_CAMERA) == PackageManager.PERMISSION_GRANTED &&
@@ -306,7 +287,21 @@ public abstract class CameraFragment extends Fragment
                 Toast.makeText(getActivity(),
                         "Camera AND storage permission are required for this demo", Toast.LENGTH_LONG).show();
             }
-            requestPermissions(new String[] {PERMISSION_CAMERA, PERMISSION_STORAGE}, PERMISSIONS_REQUEST);
+            requestPermissions(new String[]{PERMISSION_CAMERA, PERMISSION_STORAGE}, PERMISSIONS_REQUEST);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+            final int requestCode, final String[] permissions, final int[] grantResults) {
+        if (requestCode == PERMISSIONS_REQUEST) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                setFragment();
+            } else {
+                requestPermission();
+            }
         }
     }
 
@@ -385,7 +380,7 @@ public abstract class CameraFragment extends Fragment
         getChildFragmentManager()
                 .beginTransaction()
                 .replace(R.id.container, fragment)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     protected void fillBytes(final Image.Plane[] planes, final byte[][] yuvBytes) {
@@ -419,8 +414,8 @@ public abstract class CameraFragment extends Fragment
         }
     }
 
-    public void onSetDebug(final boolean debug) {}
-
+    public void onSetDebug(final boolean debug) {
+    }
 
     protected void readyForNextImage() {
         if (postInferenceCallback != null) {
@@ -444,6 +439,8 @@ public abstract class CameraFragment extends Fragment
     public abstract void processImage();
 
     public abstract void onPreviewSizeChosen(final Size size, final int rotation);
+
     public abstract int getLayoutId();
+
     public abstract Size getDesiredPreviewFrameSize();
 }

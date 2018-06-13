@@ -1,4 +1,5 @@
 package com.rebecasarai.braillewriter.fragments;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -19,14 +20,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
 import com.rebecasarai.braillewriter.R;
-import com.rebecasarai.braillewriter.classification.ObjectRecognition;
-import com.rebecasarai.braillewriter.utils.ImageUtils;
-
 import com.rebecasarai.braillewriter.classification.Classifier;
+import com.rebecasarai.braillewriter.classification.ObjectRecognition;
 import com.rebecasarai.braillewriter.classification.ResultsView;
 import com.rebecasarai.braillewriter.classification.TensorFlowImageClassifier;
 import com.rebecasarai.braillewriter.ui.objectRecognition.OverlayView;
+import com.rebecasarai.braillewriter.utils.ImageUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -37,9 +38,10 @@ import timber.log.Timber;
  * A simple {@link Fragment} subclass.
  */
 public class ObjectRecognitionFragment extends CameraFragment implements ImageReader.OnImageAvailableListener, TextToSpeech.OnInitListener, View.OnClickListener {
+
     private final String TAG = this.getClass().getSimpleName();
 
-    private List<ObjectRecognition> resultsAudio;
+    private List<ObjectRecognition> mResultsAudio = new ArrayList<>();
 
     // INSTANCE
     private static ObjectRecognitionFragment INSTANCE = new ObjectRecognitionFragment();
@@ -87,11 +89,9 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
 
     private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
 
-
     private Integer sensorOrientation;
     private Classifier classifier;
     private Matrix frameToCropTransform;
-
 
 
     @Override
@@ -173,19 +173,23 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
             ImageUtils.saveBitmap(croppedBitmap);
         }
 
+        executeResultView();
+
+    }
+
+    // TODO: better name ?
+    private void executeResultView(){
+
         runInBackground(
                 new Runnable() {
                     @Override
                     public void run() {
                         final long startTime = SystemClock.uptimeMillis();
                         final List<ObjectRecognition> results = classifier.recognizeImage(croppedBitmap);
-                        resultsAudio = results;
+                        mResultsAudio = results;
                         lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
                         Timber.v("Detect: %s", results);
                         cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
-                        if (resultsView == null) {
-                            resultsView = (ResultsView) getRootview().findViewById(R.id.results);
-                        }
                         resultsView.setResults(results);
                         requestRender();
                         readyForNextImage();
@@ -231,7 +235,6 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
         }
     }
 
-
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
@@ -263,9 +266,9 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
 
         float max = 0;
 
-        for(int i = 0; i < resultsAudio.size(); i++){
-            Log.v("Hasta ahora:",resultsAudio.toString());
-            final ObjectRecognition myRecognizedObject = (ObjectRecognition)resultsAudio.get(i);
+        for(int i = 0; i < mResultsAudio.size(); i++){
+            Log.v("Hasta ahora:", mResultsAudio.toString());
+            final ObjectRecognition myRecognizedObject = (ObjectRecognition) mResultsAudio.get(i);
 
             if(myRecognizedObject.getConfidence() > max){
                 max = myRecognizedObject.getConfidence();
@@ -303,15 +306,19 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
         tts = new TextToSpeech(getActivity(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
-
                 if(i != TextToSpeech.ERROR) {
                     tts.setLanguage(Locale.getDefault());
-
-                    //Toast.makeText(getApplicationContext(), toSpeak,Toast.LENGTH_SHORT).show();
                     tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
                 }
             }
         });
+    }
+
+
+    @Override
+    public synchronized void onResume(){
+        super.onResume();
+        resultsView = (ResultsView) getRootview().findViewById(R.id.results);
     }
 
     @Override
@@ -321,6 +328,10 @@ public class ObjectRecognitionFragment extends CameraFragment implements ImageRe
             tts.stop();
             tts.shutdown();
         }
+
+        // TODO: solves problem, but this is a bad fix, it should turn to null by itself when view rotates
+        //resultsView = null;
+
         super.onDestroy();
     }
 }
