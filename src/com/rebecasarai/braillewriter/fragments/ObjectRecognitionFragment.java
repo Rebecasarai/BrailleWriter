@@ -630,18 +630,7 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
 
     @Override
     public void onClick(View v) {
-        float max = 0;
-        for(int i = 0; i < mResultsAudio.size(); i++){
-            Timber.tag("Hasta ahora:").v(mResultsAudio.toString());
-            myRecognizedObject = (ObjectRecognition) mResultsAudio.get(i);
-
-            if(myRecognizedObject.getConfidence() > max){
-                max = myRecognizedObject.getConfidence();
-                toSpeak = myRecognizedObject.getTitle();
-
-                writeOnDatabase();// Write a message to the database
-            }
-        }
+        getMostConfidentObject();
         tts = new TextToSpeech(getActivity(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -654,10 +643,29 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
     }
 
     /**
+     * Gets the most confident object recognized, sets the toSpeak audio to the name of that
+     * object and starts the DB Firebase transactions to read and write
+     */
+    private void getMostConfidentObject(){
+        float max = 0;
+        for(int i = 0; i < mResultsAudio.size(); i++){
+            Timber.tag("Hasta ahora:").v(mResultsAudio.toString());
+            myRecognizedObject = (ObjectRecognition) mResultsAudio.get(i);
+
+            if(myRecognizedObject.getConfidence() > max){
+                max = myRecognizedObject.getConfidence();
+                toSpeak = myRecognizedObject.getTitle();
+
+                updateFirebaseDataBase();// Sets the transaction to add or update th object recognized
+            }
+        }
+    }
+
+    /**
      * Using the Firebase client, executes a Transaction to first read the DB and then write the
      * recognized object to the table on the cloud.
      */
-    private void writeOnDatabase(){
+    private void updateFirebaseDataBase(){
         final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("objects");
 
         // References the right node from the database to run transaction
@@ -666,13 +674,12 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
             public Transaction.Result doTransaction(MutableData mutableData) {
                 ObjectRecognition objectRecognized = mutableData.getValue(ObjectRecognition.class);
                 if(objectRecognized == null){
-                    // mutableData.setValue(objectRecognized);
-                    mutableData.setValue(myRecognizedObject);
+                    mutableData.setValue(myRecognizedObject); // writes on the database
                     return Transaction.success(mutableData);
                 }
 
-                objectRecognized.setTimes(objectRecognized.getTimes()+1);
-                mutableData.setValue(objectRecognized);
+                objectRecognized.setTimes(objectRecognized.getTimes()+1); // reads from db and adds ++ to column
+                mutableData.setValue(objectRecognized); // Updates the db on that particular object
                 return Transaction.success(mutableData);
             }
 
@@ -682,6 +689,7 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
             }
         });
     }
+
 
 
 

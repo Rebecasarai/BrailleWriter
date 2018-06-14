@@ -28,12 +28,11 @@ import timber.log.Timber;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BrailleTranslatorFragment extends Fragment implements View.OnClickListener, TextToSpeech.OnInitListener, AdapterView.OnItemSelectedListener {
+public class BrailleTranslatorFragment extends Fragment implements View.OnClickListener, TextToSpeech.OnInitListener{
 
 
     private static final int EDIT_REQUEST_CODE = 44;
     // Unique request code.
-    private static final int WRITE_REQUEST_CODE = 43;
 
     // Instance
     private static BrailleTranslatorFragment INSTANCE = new BrailleTranslatorFragment();
@@ -76,7 +75,6 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
         toSpeak = "Ha entrado a traductor a braille";
 
 
-
         if(model.getmSameFragment().getValue()){
             toSpeak ="";
         }
@@ -88,49 +86,56 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
     }
 
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+
         // The ACTION_OPEN_DOCUMENT intent was sent with the request code
         // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
         // response to some other intent, and the code below shouldn't run at all.
 
-        if (requestCode == EDIT_REQUEST_CODE && resultCode == getActivity().RESULT_OK) {
+        //if (requestCode == EDIT_REQUEST_CODE ) {
             // The document selected by the user won't be returned in the intent.
             // Instead, a URI to that document will be contained in the return intent
             // provided to this method as a parameter.
             // Pull that URI using resultData.getData().
-            Uri uri = null;
             if (resultData != null) {
-                uri = resultData.getData();
-                Timber.i("Uri: " + uri.toString());
-
-                String languageSelected = spinner.getSelectedItem().toString();
-                FileManagerConvertor fileManagerConvertor = new FileManagerConvertor(getContext());
-                String translated = fileManagerConvertor.readTextFromUri(uri, languageSelected);
-                if (!translated.equals("")) {
-                    fileManagerConvertor.writeToFile(translated);
-                } else {
-                    toSpeak = "";
-                }
+                Timber.e("Llega aqui a uri resultData no nulo");
+                startTranlationToBraille(resultData.getData());
 
             }
+        //}
+    }
+
+    /**
+     *
+     * @param uri
+     */
+    private void startTranlationToBraille(Uri uri){
+
+        Timber.i("Uri: %s", uri.toString());
+        String languageSelected = spinner.getSelectedItem().toString();
+        FileManagerConvertor fileManagerConvertor = new FileManagerConvertor(getContext());
+        String translated = fileManagerConvertor.readTextFromUri(uri, languageSelected);
+        if (!translated.equals("")) {
+            fileManagerConvertor.writeToFile(translated);
+            toSpeak = "Traducido correctamente";
+
+        } else {
+            toSpeak = "Lo sentimos, no se ha traducido correctamente";
         }
+        tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
 
-        if (requestCode == WRITE_REQUEST_CODE && resultCode == getActivity().RESULT_OK) {
-
-        }
-
-
-        super.onActivityResult(requestCode, resultCode, resultData);
     }
 
 
     @Override
     public void onClick(View v) {
+        openDocument();
         switch (v.getId()) {
             case R.id.convertFileButton:
 
-                openDocument();
+
 
                 break;
 
@@ -190,16 +195,7 @@ public class BrailleTranslatorFragment extends Fragment implements View.OnClickL
         // Filter to show only text files.
         intent.setType("text/plain");
 
-        startActivityForResult(intent, EDIT_REQUEST_CODE);
-    }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
+        getInstance().startActivityForResult(intent, EDIT_REQUEST_CODE);
 
     }
 }

@@ -113,32 +113,57 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        Timber.e("codigos: "+requestCode +" "+ " "+resultCode+" "+data);
+        if (requestCode == 65580) {
+            mSelectedFragment.onActivityResult(requestCode, resultCode, data);
+        }
+
         if (requestCode == 1001) {
-            int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
-            String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
-            String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
+            afterBuyFlow(resultCode, data);
+        }
+    }
 
-            if (resultCode == RESULT_OK) {
-                try {
-                    JSONObject jo = new JSONObject(purchaseData);
-                    String sku = jo.getString("productId");
-                    Timber.e("You have bought the " + sku + ". Excellent choice, adventurer!");
+    /**
+     * Its called only if a bou flow intent was called, meaning if the user started the subscription
+     * dialog and either cancelled or subscribed.
+     * @param resultCode
+     * @param data
+     */
+    private void afterBuyFlow(int resultCode,  Intent data){
+        int responseCode = data.getIntExtra("RESPONSE_CODE", 0);
+        String purchaseData = data.getStringExtra("INAPP_PURCHASE_DATA");
+        String dataSignature = data.getStringExtra("INAPP_DATA_SIGNATURE");
 
+        if (resultCode == RESULT_OK) {
+            sucessfullySubscribed(purchaseData);
+        }
+    }
 
-                    msubsVM.setIsRecentlySuscribed(true);
-                    mSelectedFragment = getSupportFragmentManager().findFragmentByTag("currentFragment");
-                    if(mSelectedFragment != null){
-                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.framelayout, mSelectedFragment, "currentFragment");
-                        transaction.commitAllowingStateLoss();
-                        mStateVM.setmSeletedFragment(mSelectedFragment);
-                    }
-                }
-                catch (JSONException e) {
-                    Timber.e("Failed to parse purchase data.");
-                    e.printStackTrace();
-                }
+    /**
+     * Called only if a user succesfully subscribed or started Free trial. FRom the string I get an
+     * JSON Object and from there, it gets all the information of interest, like the ID or SKU of
+     * the product of subscription bought.
+     * @param purchaseData String representing
+     */
+    private void sucessfullySubscribed(String purchaseData){
+        try {
+            JSONObject jo = new JSONObject(purchaseData);
+            String sku = jo.getString("productId");
+            Timber.e("You have bought the " + sku + ". Excellent choice, adventurer!");
+
+            msubsVM.setIsRecentlySuscribed(true);
+            mSelectedFragment = getSupportFragmentManager().findFragmentByTag("currentFragment");
+            if(mSelectedFragment != null){
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.framelayout, mSelectedFragment, "currentFragment");
+                transaction.commitAllowingStateLoss();
+                mStateVM.setmSeletedFragment(mSelectedFragment);
             }
+        }
+        catch (JSONException e) {
+            Timber.e("Failed to parse purchase data.");
+            e.printStackTrace();
         }
     }
 
