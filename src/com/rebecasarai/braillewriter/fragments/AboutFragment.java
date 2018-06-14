@@ -85,37 +85,37 @@ public class AboutFragment extends Fragment implements View.OnClickListener, Tex
 
     /**
      * Determines with the SubscriptionManager whereas the user its subscribed or not.
-     * If its recently subscribed, meaning its the first fragment its getting into after subscribing,
-     * the string to speak is to let him/her know its successfully subscribed.
+     * If its recently subscribed, meaning its the first fragment its getting into after
+     * subscribing, the string to speak is to let him/her know its successfully subscribed.
      */
     private void checkSubscribed(){
         msubsVM.getIsSubscribed().observe(this, new Observer<Boolean>() {
             @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
+            public void onChanged(@Nullable Boolean isSubscribed) {
 
-            if (aBoolean) {
+                if (isSubscribed) {
 
-                checkRecentlySubscribed();
-                showManageSubs();
+                    checkRecentlySubscribed();
+                    showManageSubs();
 
-            } else {
-                Subscription subsDetails = msubsVM.getMonthSubsDetails();
-                showSubDetails(subsDetails);
-            }
-
+                } else {
+                    Subscription subsDetails = msubsVM.getMonthSubsDetails();
+                    showSubDetails(subsDetails);
+                }
             }
         });
     }
 
     /**
-     * Checks if it has been a change in the currtent state of the user, meaning, if it has subscribed
-     * or unsubscribed during the time of being in the fragment.
+     * Checks if it has been a change in the currtent state of the user, meaning, if it has
+     * subscribed or unsubscribed during the time of being in the fragment.
      */
     private void checkRecentlySubscribed(){
-        if (msubsVM.getIsRecentlySuscribed().getValue()) {
-            toSpeak = "Felicidades, se ha suscrito exitosamente.";
-            msubsVM.setIsRecentlySuscribed(false);
+        if (!msubsVM.getIsRecentlySuscribed().getValue()) {
+            return;
         }
+        toSpeak = "Felicidades, se ha suscrito exitosamente.";
+        msubsVM.setIsRecentlySuscribed(false);
     }
 
     @Override

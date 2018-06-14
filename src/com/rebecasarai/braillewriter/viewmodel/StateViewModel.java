@@ -47,7 +47,7 @@ public class StateViewModel extends AndroidViewModel {
         mFirstTime = false;
         mSameFragment.setValue(false);
 
-        if (mSeletedFragment.getValue().getClass().toString().toUpperCase().equals(seletedFragment.getClass().toString().toUpperCase())) {
+        if (mSeletedFragment.getValue().getClass().getName().toUpperCase().equals(seletedFragment.getClass().getName().toUpperCase())) {
             mSameFragment.setValue(true);
         }
 

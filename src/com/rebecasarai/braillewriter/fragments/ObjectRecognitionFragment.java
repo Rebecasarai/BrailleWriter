@@ -119,6 +119,7 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
     private Integer sensorOrientation;
     private Classifier classifier;
     private Matrix frameToCropTransform;
+    ObjectRecognition myRecognizedObject;
 
 
     public ObjectRecognitionFragment() {
@@ -629,44 +630,16 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
 
     @Override
     public void onClick(View v) {
-
         float max = 0;
-
         for(int i = 0; i < mResultsAudio.size(); i++){
-            Log.v("Hasta ahora:", mResultsAudio.toString());
-            final ObjectRecognition myRecognizedObject = (ObjectRecognition) mResultsAudio.get(i);
+            Timber.tag("Hasta ahora:").v(mResultsAudio.toString());
+            myRecognizedObject = (ObjectRecognition) mResultsAudio.get(i);
 
             if(myRecognizedObject.getConfidence() > max){
                 max = myRecognizedObject.getConfidence();
                 toSpeak = myRecognizedObject.getTitle();
 
-                // Write a message to the database
-                final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("objects");
-
-                // References the right node from the database to run transaction
-                mDatabase.child(myRecognizedObject.getTitle()).runTransaction(new Transaction.Handler() {
-
-                    @Override
-                    public Transaction.Result doTransaction(MutableData mutableData) {
-                        ObjectRecognition objectRecognized = mutableData.getValue(ObjectRecognition.class);
-                        if(objectRecognized == null){
-                            // mutableData.setValue(objectRecognized);
-                            mutableData.setValue(myRecognizedObject);
-                            return Transaction.success(mutableData);
-                        }
-
-                        objectRecognized.setTimes(objectRecognized.getTimes()+1);
-                        mutableData.setValue(objectRecognized);
-                        return Transaction.success(mutableData);
-
-                    }
-
-                    @Override
-                    public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
-                        Timber.d( "Transaction:onComplete:" + databaseError);
-                    }
-                });
-
+                writeOnDatabase();// Write a message to the database
             }
         }
         tts = new TextToSpeech(getActivity(), new TextToSpeech.OnInitListener() {
@@ -676,6 +649,36 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
                     tts.setLanguage(Locale.getDefault());
                     tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
                 }
+            }
+        });
+    }
+
+    /**
+     * Using the Firebase client, executes a Transaction to first read the DB and then write the
+     * recognized object to the table on the cloud.
+     */
+    private void writeOnDatabase(){
+        final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("objects");
+
+        // References the right node from the database to run transaction
+        mDatabase.child(myRecognizedObject.getTitle()).runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                ObjectRecognition objectRecognized = mutableData.getValue(ObjectRecognition.class);
+                if(objectRecognized == null){
+                    // mutableData.setValue(objectRecognized);
+                    mutableData.setValue(myRecognizedObject);
+                    return Transaction.success(mutableData);
+                }
+
+                objectRecognized.setTimes(objectRecognized.getTimes()+1);
+                mutableData.setValue(objectRecognized);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                Timber.d( "Transaction:onComplete:" + databaseError);
             }
         });
     }

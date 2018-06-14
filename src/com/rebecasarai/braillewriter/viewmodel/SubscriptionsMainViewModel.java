@@ -19,8 +19,6 @@ import android.widget.Toast;
 import com.android.vending.billing.IInAppBillingService;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import com.rebecasarai.braillewriter.Repository;
-import com.rebecasarai.braillewriter.fragments.ReadFragment;
 import com.rebecasarai.braillewriter.subscription.Subscription;
 
 import java.util.ArrayList;
@@ -29,9 +27,8 @@ import timber.log.Timber;
 
 
 public class SubscriptionsMainViewModel extends AndroidViewModel {
-    private Repository mRepository;
     private boolean mIsBinded;
-    private String tag;
+    private String tag = getClass().getName();
     private MutableLiveData<ServiceConnection> mServiceConn = new MutableLiveData<>();
     private Application app;
     private IInAppBillingService mService;
@@ -46,17 +43,21 @@ public class SubscriptionsMainViewModel extends AndroidViewModel {
         super(application);
         createService();
         app = application;
-        tag = "In App Billing";
+        binderService();
         isRecentlySuscribed.setValue(false);
+        isSubscribed.setValue(checkSubscribedMonth());
+    }
 
+    /**
+     * Binds the service of the In App Billing Servicem so it can connect to the oficial API and
+     * execute purchase or subscriptions operations and it pays on the app (Or start Free Trial).
+     */
+    private void binderService(){
         Intent billingIntent = new Intent("com.android.vending.billing.InAppBillingService.BIND");
         billingIntent.setPackage("com.android.vending");
         mIsBinded = app.bindService(billingIntent, mServiceConn.getValue(), Context.BIND_AUTO_CREATE);
-
-        isSubscribed.setValue(checkSubscribedMonth());
-        Timber.i("bindService - return " + String.valueOf(mIsBinded));
+        Timber.i("bindService - return %s", String.valueOf(mIsBinded));
     }
-
 
     /**
      * The Service Connection to being able to connect with the In App Android Billing API
@@ -168,7 +169,7 @@ public class SubscriptionsMainViewModel extends AndroidViewModel {
 
             } catch (JsonParseException e) {
                 e.printStackTrace();
-                Timber.e("Gson parse failed: " + e);
+                Timber.e("Gson parse failed: %s", e);
             }
         }
 
@@ -178,7 +179,6 @@ public class SubscriptionsMainViewModel extends AndroidViewModel {
     /**
      * Gets the Details of the subscription product. This allows to show on fragments the information
      * related to the subscription. Calls getSKUDetails, that returns a JSON Object.
-     *
      * @return Subscription Object representing the product once parsed from the JSON object.
      */
     public Subscription getMonthSubsDetails() {
@@ -193,6 +193,7 @@ public class SubscriptionsMainViewModel extends AndroidViewModel {
     public Bundle buySubscription() {
         return buySKU(subscriptionID);
     }
+
 
     /**
      * Buys a particular Product that this time is the monthly subscription, by making a request to the API
@@ -212,7 +213,7 @@ public class SubscriptionsMainViewModel extends AndroidViewModel {
             buyIntentBundle = mService.getBuyIntent(3, app.getPackageName(), sku, "subs", "bGoa+V7g/yqDXvKRqq+JTFn4uQZbPiQJo4pf9RzJ");
             int response = buyIntentBundle.getInt("RESPONSE_CODE");
 
-            Timber.i(tag, "getBuyIntent() RESPONSE_CODE: " + String.valueOf(response));
+            Timber.i(tag, "getBuyIntent() RESPONSE_CODE: %s", String.valueOf(response));
 
             if (response != 0) notifyError();
         } catch (RemoteException e) {

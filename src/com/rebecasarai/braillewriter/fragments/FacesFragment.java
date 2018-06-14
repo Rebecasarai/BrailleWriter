@@ -137,7 +137,6 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
      * with the user is interrupted. In this case you will receive empty permissions
      * and results arrays which should be treated as a cancellation.
      * </p>
-     *
      * @param requestCode  The request code passed in {@link #requestPermissions(String[], int)}.
      * @param permissions  The requested permissions. Never null.
      * @param grantResults The grant results for the corresponding permissions
@@ -164,14 +163,11 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
                 " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
 
         requestCameraPermission();
-
-
     }
 
 
-
     /**
-     * Creates and starts the camera.  Note that this uses a higher resolution
+     * Creates and starts the camera to later build the detector. On higher resolution
      */
     private void createCameraSource() {
         Context context = getContext();
@@ -184,11 +180,6 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
                         .build());
 
         if (!detector.isOperational()) {
-            // Note: The first time that an app using face API is installed on a device, GMS will
-            // download a native library to the device in order to do detection.  Usually this
-            // completes before the app is run for the first time.  But if that download has not yet
-            // completed, then the above call will not detect any faces.
-            //
             // isOperational() can be used to check if the required native library is currently
             // available.  The detector will automatically become operational once the library
             // download completes on device.
@@ -273,21 +264,21 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
 
         // If at least a face is currently detected
         if (mFace != null && mFaceDetected){
-            Log.v("Onclik", " Recibe el onclick con sonrisa: " + mFaceHappiness);
+            Timber.v(" Recibe el onclick con sonrisa: %s", mFaceHappiness);
 
             if(mFaceHappiness > 0.5){
 
                 toSpeak = "Está alegre";
-                Log.v("llego a feliz con:", ""+mFaceHappiness);
+                Timber.v("llego a feliz con: %s", mFaceHappiness);
 
             }if(mFaceHappiness < 0.5 && mFaceHappiness > 0.1){
 
                 toSpeak = "Esta serio";
-                Log.v("llego a ", "serio");
+                Timber.v("llego a %s", "serio");
             }if(mFaceHappiness< 0.1) {
 
                 toSpeak = "Esta muy serio. Tal vez enojado.";
-                Log.v("llego a ", "muy muy serio");
+                Timber.v("llego a %s", "muy muy serio");
             }
 
             tts.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
