@@ -114,14 +114,19 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        Timber.e("codigos: "+requestCode +" "+ " "+resultCode+" "+data);
-        if (requestCode == 65580) {
-            mSelectedFragment.onActivityResult(requestCode, resultCode, data);
-        }
-
         if (requestCode == 1001) {
             afterBuyFlow(resultCode, data);
+            return;
         }
+
+        Timber.e("codigos: "+requestCode +" "+ " "+resultCode+" "+data);
+            if(mSelectedFragment != null){
+                mSelectedFragment.onActivityResult(requestCode, resultCode, data);
+            }else{
+                ReadFragment.getInstance().onActivityResult(requestCode, resultCode, data);
+            }
+
+
     }
 
     /**

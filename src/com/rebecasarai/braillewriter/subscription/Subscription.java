@@ -18,6 +18,9 @@ package com.rebecasarai.braillewriter.subscription;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * The Subscription object to parse the JSOn response from the API
+ */
 public class Subscription {
     private String productId, title, price, description, type;
 

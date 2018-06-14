@@ -26,8 +26,6 @@ import java.util.List;
  */
 public class Size implements Comparable<Size>, Serializable {
 
-  // 1.4 went out with this UID so we'll need to maintain it to preserve pending queries when
-  // upgrading.
   public static final long serialVersionUID = 7689808733290872361L;
 
   public final int width;
