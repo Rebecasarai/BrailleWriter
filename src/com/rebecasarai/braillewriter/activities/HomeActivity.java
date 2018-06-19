@@ -12,6 +12,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
+import com.rebecasarai.braillewriter.classification.ObjectRecognition;
 import com.rebecasarai.braillewriter.viewmodel.StateViewModel;
 import com.rebecasarai.braillewriter.viewmodel.SubscriptionsMainViewModel;
 import com.rebecasarai.braillewriter.fragments.ObjectRecognitionFragment;
@@ -155,7 +162,7 @@ public class HomeActivity extends AppCompatActivity {
         try {
             JSONObject jo = new JSONObject(purchaseData);
             String sku = jo.getString("productId");
-            Timber.e("You have bought the " + sku + ". Excellent choice, adventurer!");
+            Timber.e("You have bought the " + sku + ". Excellent choice, adventurer! "+ jo.toString());
 
             msubsVM.setIsRecentlySuscribed(true);
             mSelectedFragment = getSupportFragmentManager().findFragmentByTag("currentFragment");
@@ -165,6 +172,7 @@ public class HomeActivity extends AppCompatActivity {
                 transaction.commitAllowingStateLoss();
                 mStateVM.setmSeletedFragment(mSelectedFragment);
             }
+
         }
         catch (JSONException e) {
             Timber.e("Failed to parse purchase data.");
@@ -178,7 +186,30 @@ public class HomeActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    private void updateSubscribers(){
+        final DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("subscriptions");
 
+        /*// References the right node from the database to run transaction
+        mDatabase.child(myRecognizedObject.getTitle()).runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                ObjectRecognition objectRecognized = mutableData.getValue(ObjectRecognition.class);
+                if(objectRecognized == null){
+                    mutableData.setValue(myRecognizedObject); // writes on the database
+                    return Transaction.success(mutableData);
+                }
+
+                objectRecognized.setTimes(objectRecognized.getTimes()+1); // reads from db and adds ++ to column
+                mutableData.setValue(objectRecognized); // Updates the db on that particular object
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean b, DataSnapshot dataSnapshot) {
+                Timber.d( "Transaction:onComplete:" + databaseError);
+            }
+        });*/
+    }
 
 
 

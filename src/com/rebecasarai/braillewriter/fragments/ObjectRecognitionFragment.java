@@ -529,7 +529,6 @@ public class ObjectRecognitionFragment extends Fragment implements ImageReader.O
         executeResultView();
     }
 
-    // TODO: better name ?
     private void executeResultView(){
 
         runInBackground(
