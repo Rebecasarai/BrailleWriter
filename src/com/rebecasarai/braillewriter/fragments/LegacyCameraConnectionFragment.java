@@ -57,7 +57,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
   @Override
   public void onSaveInstanceState(Bundle outState) {
     outState.putInt("layout", layout);
-    //outState.putSize("desiredSize", desiredSize);
+    outState.putSize("desiredSize", desiredSize);
 
     // call superclass to save any view hierarchy
     super.onSaveInstanceState(outState);
@@ -70,7 +70,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
     if(savedInstanceState !=null){
 
       this.layout = savedInstanceState.getInt("layout");
-      //this.desiredSize = savedInstanceState.getSize("desiredSize");
+      this.desiredSize = savedInstanceState.getSize("desiredSize");
     }
   }
 
@@ -206,6 +206,7 @@ public class LegacyCameraConnectionFragment extends Fragment {
     // the SurfaceTextureListener).
 
     if (textureView.isAvailable()) {
+
       camera.startPreview();
     } else {
       textureView.setSurfaceTextureListener(surfaceTextureListener);

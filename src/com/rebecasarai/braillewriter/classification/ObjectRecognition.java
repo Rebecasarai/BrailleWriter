@@ -37,6 +37,8 @@ public class ObjectRecognition {
         this.times = 1;
     }
 
+    public ObjectRecognition() {
+    }
 
     public String getId() {
         return id;
