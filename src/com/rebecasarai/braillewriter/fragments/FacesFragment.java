@@ -366,7 +366,6 @@ public class FacesFragment extends Fragment implements View.OnClickListener,Text
         @Override
         public void onMissing(FaceDetector.Detections<Face> detectionResults) {
             mOverlay.remove(mFaceGraphic);
-            mFaceDetected = false;
         }
 
         /**
